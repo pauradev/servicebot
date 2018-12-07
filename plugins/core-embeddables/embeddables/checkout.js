@@ -293,7 +293,7 @@ class CheckoutPage extends React.Component {
         let {selectedPlan, selectedTemplate} = this.state;
         return `<div id="servicebot-request-form"></div>
                 <script src="https://js.stripe.com/v3/"></script>
-                <script src="https://js.servicebot.io/js/servicebot-checkout-embed.js" type="text/javascript"></script>
+                <script src="http://subscribe.printaura.com/js/servicebot-checkout-embed.js" type="text/javascript"></script>
                 <script  type="text/javascript">
                     Servicebot.Checkout({
                         templateId : ${selectedTemplate},

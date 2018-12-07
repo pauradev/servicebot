@@ -4,7 +4,7 @@
 <script  type="text/javascript">
     Servicebot.Tiers({
         templateId : 1,
-        url : "https://myprintingbussiness.serviceshop.io",
+        url : "http://subscribe.printaura.com",
         selector : document.getElementById('servicebot-tiers-embed'),
         handleResponse : (response) => {
             //Response function, you can put redirect logic or app integration logic here
