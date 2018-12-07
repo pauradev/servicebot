@@ -19,30 +19,46 @@ class ManagePermission extends React.Component {
     }
 
     render () {
+        let pageName = this.props.route.name;
+        let subtitle = 'Manage user permissions based on their roles';
+
         if(isAuthorized({permissions: ["can_administrate"]})){
             return(
-                <div className="page __manage-permission">
-                    <Content>
-                        <div className="servicebot-table-base">
-                            <ManagePermissionForm />
-                        </div>
-                    </Content>
+                <div>
+                    <Jumbotron pageName={pageName} subtitle={subtitle}/>
+                    <div className="page-service-instance">
+                        <Content>
+                            <div className="row m-b-20">
+                                <ManagePermissionForm />
+                            </div>
+                        </Content>
+                    </div>
                 </div>
             );
         }else if(isAuthorized({permissions: ["can_manage"]})){
             return(
-                <div className="page __manage-permission">
-                    <Content>
-                        <p>This feature is turned off for this demo.</p>
-                    </Content>
+                <div>
+                    <Jumbotron pageName={pageName} location={this.props.location}/>
+                    <div className="page-service-instance">
+                        <Content>
+                            <div className="row m-b-20">
+                                <p>This feature is turned off for this demo.</p>
+                            </div>
+                        </Content>
+                    </div>
                 </div>
             );
         }else{
             return(
-                <div className="page __manage-permission">
-                    <Content>
-                        <p>Unauthorized</p>
-                    </Content>
+                <div>
+                    <Jumbotron pageName={pageName} location={this.props.location}/>
+                    <div className="page-service-instance">
+                        <Content>
+                            <div className="row m-b-20">
+                                <p>Unauthorized</p>
+                            </div>
+                        </Content>
+                    </div>
                 </div>
             )
         }

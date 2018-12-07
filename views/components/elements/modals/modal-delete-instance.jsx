@@ -1,7 +1,7 @@
 import React from 'react';
 import cookie from 'react-cookie';
 import {Authorizer, isAuthorized} from "../../utilities/authorizer.jsx";
-import {Fetcher} from "servicebot-base-form"
+import Fetcher from "../../utilities/fetcher.jsx"
 import {browserHistory} from 'react-router';
 import Modal from '../../utilities/modal.jsx';
 
@@ -60,8 +60,8 @@ class ModalRequestCancellation extends React.Component {
                                 </div>
                             </div>
                             <div className={`modal-footer text-right p-b-20`}>
-                                <button className="buttons btn-default btn-rounded" onClick={self.props.hide}>Nevermind</button>
-                                <button className="buttons btn-danger btn-rounded" onClick={self.onDelete}>Delete Service</button>
+                                <button className="btn btn-default btn-rounded" onClick={self.props.hide}>Nevermind</button>
+                                <button className="btn btn-danger btn-rounded" onClick={self.onDelete}>Delete Service</button>
                             </div>
                         </div>
                     </Modal>

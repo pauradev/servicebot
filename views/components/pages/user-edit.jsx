@@ -1,7 +1,8 @@
 import React from 'react';
 import {browserHistory} from 'react-router';
 import {Authorizer, isAuthorized} from "../utilities/authorizer.jsx";
-import {Fetcher} from "servicebot-base-form";
+import Fetcher from "../utilities/fetcher.jsx";
+import Jumbotron from "../layouts/jumbotron.jsx";
 import Content from "../layouts/content.jsx";
 import ContentTitle from "../layouts/content-title.jsx";
 import UserFormEdit from "../elements/forms/user-form-edit.jsx";
@@ -42,10 +43,15 @@ class UserEdit extends React.Component {
         if(this.state.loading){
             return(
                 <Authorizer permissions="can_administrate">
-                    <div className="page __manage-my-profile">
+                    <Jumbotron pageName={pageName} location={this.props.location}/>
+                    <div className="page-service-instance">
                         <Content>
-                            <ContentTitle icon="cog" title="Edit User"/>
-                            <Load/>
+                            <div className="row m-b-20">
+                                <div className="col-xs-12">
+                                    <ContentTitle icon="cog" title="Edit User"/>
+                                        <Load/>
+                                </div>
+                            </div>
                         </Content>
                     </div>
                 </Authorizer>
@@ -53,9 +59,14 @@ class UserEdit extends React.Component {
         }else {
             return (
                 <Authorizer permissions="can_administrate">
-                    <div className="page __manage-my-profile">
+                    <Jumbotron pageName={pageName} location={this.props.location}/>
+                    <div className="page-service-instance">
                         <Content>
-                            <UserFormEdit myUser={this.state.myUser}/>
+                            <div className="row m-b-20">
+                                <div className="col-xs-12">
+                                    <UserFormEdit myUser={this.state.myUser}/>
+                                </div>
+                            </div>
                         </Content>
                     </div>
                 </Authorizer>

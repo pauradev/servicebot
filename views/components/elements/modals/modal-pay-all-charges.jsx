@@ -1,7 +1,7 @@
 import React from 'react';
 import cookie from 'react-cookie';
 import Load from '../../utilities/load.jsx';
-import {Fetcher} from "servicebot-base-form"
+import Fetcher from "../../utilities/fetcher.jsx"
 import {browserHistory} from 'react-router';
 import Modal from '../../utilities/modal.jsx';
 import ModalPaymentSetup from './modal-payment-setup.jsx';
@@ -14,7 +14,6 @@ class ModalPayAllCharges extends React.Component {
 
     constructor(props){
         super(props);
-        console.log("HELLO!2");
         let uid = cookie.load("uid");
         if(this.props.ownerId){
             uid = this.props.ownerId;
@@ -108,7 +107,6 @@ class ModalPayAllCharges extends React.Component {
     }
 
     render () {
-        console.log("HELLO!");
         let self = this;
         let pageName = "Pay Charges";
         let currentModal = this.state.current_modal;
@@ -134,8 +132,8 @@ class ModalPayAllCharges extends React.Component {
                             </div>
                         </div>
                         <div className={`modal-footer text-right p-b-20`}>
-                            <button className="buttons btn-default btn-rounded" onClick={self.props.hide}>Later</button>
-                            <button className="buttons btn-primary btn-rounded" onClick={self.onPay}><i className="fa fa-credit-card" /> Confirm Payment</button>
+                            <button className="btn btn-default btn-rounded" onClick={self.props.hide}>Later</button>
+                            <button className="btn btn-primary btn-rounded" onClick={self.onPay}><i className="fa fa-credit-card" /> Confirm Payment</button>
                         </div>
                     </div>
                 </Modal>
@@ -153,7 +151,7 @@ class ModalPayAllCharges extends React.Component {
                             </div>
                         </div>
                         <div className={`modal-footer text-right p-b-20`}>
-                            <button className="buttons btn-default btn-rounded" onClick={self.props.hide}>Close</button>
+                            <button className="btn btn-default btn-rounded" onClick={self.props.hide}>Close</button>
                         </div>
                     </div>
                 </Modal>

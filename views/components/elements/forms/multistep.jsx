@@ -1,4 +1,5 @@
 import React from 'react';
+import Buttons from '../../../components/elements/buttons.jsx';
 
 class Multistep extends React.Component {
 
@@ -55,9 +56,9 @@ class Multistep extends React.Component {
         let stepToRender = this.props.steps[currentStep];
         let stepName = stepToRender.name;
         let stepComponent = stepToRender.component;
-        let nextButton = <button className="buttons btn-rounded btn-default" onClick={self.stepForward}>Next</button>;
+        let nextButton = <button className="btn btn-rounded btn-default" onClick={self.stepForward}>Next</button>;
         if(currentStep == this.props.steps.length - 1){
-            nextButton = <button className="buttons btn-rounded btn-success" type="submit" >Submit</button>;
+            nextButton = <button className="btn btn-rounded btn-success" type="submit" >Submit</button>;
         }
 
 
@@ -67,7 +68,7 @@ class Multistep extends React.Component {
                 <hr/>
                 {stepComponent}
                 <div className="control-btns">
-                    {currentStep > 0 && <button className="buttons btn-rounded btn-default" onClick={this.stepBackward}>Previous</button>}
+                    {currentStep > 0 && <button className="btn btn-rounded btn-default" onClick={this.stepBackward}>Previous</button>}
                     {nextButton}
                 </div>
 

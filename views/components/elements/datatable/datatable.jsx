@@ -173,7 +173,7 @@ class DataTable extends React.Component {
                         {this.state.searchbar &&
                             <div className="data-table-search">
                                 <label>Quick Search: </label>
-                                <input className="_input-" onChange={this.handleSearch}/>
+                                <input className="form-control" onChange={this.handleSearch}/>
                             </div>
                         }
                         <table className="table datatable table-striped table-hover">
@@ -191,7 +191,7 @@ class DataTable extends React.Component {
                             <tbody>
                             {this.state.resObjs.map((resObj, index) => (
                                 <tr key={"row-" + index} className={this.rowClasses(resObj) || ''}>
-                                    {/*{}*/}
+                                    {/*{console.log("The resObj: ", resObj)}*/}
                                     {this.state.col.map(column => (
                                         <td key={`row-${index}-cell-${column}`}>
 

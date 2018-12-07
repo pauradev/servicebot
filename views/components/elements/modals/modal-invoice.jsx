@@ -2,11 +2,13 @@ import React from 'react';
 import Load from '../../utilities/load.jsx';
 import {browserHistory} from 'react-router';
 import cookie from 'react-cookie';
-import {Fetcher} from "servicebot-base-form";
+import Fetcher from "../../utilities/fetcher.jsx";
 import Modal from '../../utilities/modal.jsx';
 import DateFormat from '../../utilities/date-format.jsx';
 import {Price} from '../../utilities/price.jsx';
 import { connect } from "react-redux";
+import getSymbolFromCurrency from 'currency-symbol-map';
+let _ = require("lodash");
 
 class ModalInvoice extends React.Component {
 
@@ -54,19 +56,23 @@ class ModalInvoice extends React.Component {
     }
 
     render () {
-        let { loading, nextInvoice, currentUser } = this.state;
-        let { icon, show, hide } = this.props;
+        let self = this;
+        let pageName = "Upcoming Invoice";
 
-        if(loading){
-            return <Load/>;
+        if(self.state.loading){
+            return(
+                <Load/>
+            );
         }else{
-            let myNextInvoice = nextInvoice;
+            let myNextInvoice = self.state.nextInvoice;
             if(myNextInvoice){
                 let amountDue = myNextInvoice.amount_due || 0;
                 let total = myNextInvoice.total || 0;
+                let prefix = getSymbolFromCurrency(myNextInvoice.currency);
                 let nextPaymentAttempt = myNextInvoice.next_payment_attempt || '';
                 let closed = myNextInvoice.closed || false;
                 let paid = myNextInvoice.paid || false;
+
                 let lineItemCount = myNextInvoice.lines.total_count || 0;
                 let lineItems = myNextInvoice.lines.data; //data is an array of objects
 
@@ -86,7 +92,7 @@ class ModalInvoice extends React.Component {
                             <tr key={item.id}>
                                 <td>{item_name(item)}</td>
                                 <td><DateFormat date={nextPaymentAttempt}/></td>
-                                <td><Price value={item.amount} currency={myNextInvoice.currency}/></td>
+                                <td><Price value={item.amount} prefix={prefix}/></td>
                             </tr>
                         )
                     );
@@ -94,31 +100,45 @@ class ModalInvoice extends React.Component {
 
                 let last4, fund = null;
 
-                if(currentUser) {
-                    fund = currentUser.references.funds;
+                if(self.state.currentUser) {
+                    fund = self.state.currentUser.references.funds;
                     if(fund && fund.length > 0){
                         last4 = fund[0].source.card.last4;
                     }
                 }
 
+                let modalHeadingStyle = {};
+                if(this.props.options){
+                    let options = this.props.options;
+                    modalHeadingStyle.backgroundColor = _.get(options, 'primary_theme_background_color.value', '#000000');
+                }
+
                 return(
-                    <Modal modalTitle="Upcoming Invoice" icon="fa-credit-card-alt" show={show} hide={hide}>
-                        <div className="__modal __upcoming-invoice">
-                            <div className="__invoice-information">
-                                <div className="__amount">
-                                    <strong>Amount</strong><br/>
-                                    <span><i className="fa fa-money"/><Price value={amountDue} currency={myNextInvoice.currency}/></span><br/>
-                                </div>
-                                <div className="__date">
-                                    <strong>On Date</strong><br/>
-                                    <span><i className="fa fa-calendar-o"/><DateFormat date={nextPaymentAttempt}/></span><br/>
-                                </div>
-                                <div className="__payment-method">
-                                    <strong>Method</strong><br/>
-                                    <span><i className="fa fa-credit-card"/>*** *** *** {last4}</span><br/>
+                    <Modal modalTitle={pageName} icon="fa-credit-card-alt" show={this.props.show} hide={this.props.hide}>
+                        <div id="invoice-modal" className="table-responsive">
+                            <div className="invoice-widget" style={modalHeadingStyle}>
+                                <div className="row">
+                                    <div className="col-xs-12 col-sm-4">
+                                        <div className="address">
+                                            <strong>Amount To Be Charged</strong><br/>
+                                            <span><i className="fa fa-money"/><Price value={amountDue} perfix={prefix}/></span><br/>
+                                        </div>
+                                    </div>
+                                    <div className="col-xs-12 col-sm-4">
+                                        <div className="address">
+                                            <strong>Charge Date</strong><br/>
+                                            <span><i className="fa fa-calendar-o"/><DateFormat date={nextPaymentAttempt}/></span><br/>
+                                        </div>
+                                    </div>
+                                    <div className="col-xs-12 col-sm-4">
+                                        <div className="payment-method">
+                                            <strong>Using Payment Method</strong><br/>
+                                            <span><i className="fa fa-credit-card"/>*** *** *** {last4}</span><br/>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                            <table className="table __invoice-table">
+                            <table id="invoice-table" className="table table-striped table-hover">
                                 <thead>
                                     <tr>
                                         <td className="service-description"><strong>Service Item</strong></td>
@@ -129,11 +149,11 @@ class ModalInvoice extends React.Component {
                                 <tbody>
                                     {items()}
                                 </tbody>
-                                <tfoot className="__invoice-footer">
+                                <tfoot className="invoice-footer">
                                     <tr>
                                         <td/>
                                         <td>Total:</td>
-                                        <td><Price value={total} currency={myNextInvoice.currency}/></td>
+                                        <td><Price value={total} perfix={prefix}/></td>
                                     </tr>
                                 </tfoot>
                             </table>
@@ -142,10 +162,14 @@ class ModalInvoice extends React.Component {
                 );
             }else{
                 return(
-                    <Modal modalTitle="Upcoming Invoice" icon={icon} show={show} hide={hide}>
-                        <div className="invoice-modal">
-                            <div className="__invoice-information">
-                                <p className="__no-invoice">You do not have any invoice at the moment.</p>
+                    <Modal modalTitle={pageName} icon={this.props.icon} show={this.props.show} hide={this.props.hide}>
+                        <div className="table-responsive">
+                            <div className="invoice-widget">
+                                <div className="row">
+                                    <div className="col-xs-12">
+                                        <h4>You do not have any invoice at the moment.</h4>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </Modal>

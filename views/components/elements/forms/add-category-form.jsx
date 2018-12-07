@@ -1,6 +1,8 @@
 import React from 'react';
+import Fetcher from "../../utilities/fetcher.jsx"
 import {get, has} from "lodash";
-import {ServicebotBaseForm, inputField} from "servicebot-base-form";
+import ServiceBotBaseForm from "./servicebot-base-form.jsx";
+import {inputField} from "./servicebot-base-field.jsx";
 import {Field,} from 'redux-form';
 import { required, email, numericality, length } from 'redux-form-validators';
 
@@ -22,7 +24,7 @@ class AddCategoryForm extends React.Component{
 
         return(
             <div id="add-category-form">
-                <ServicebotBaseForm
+                <ServiceBotBaseForm
                     form={categoryFormElements}
                     // initialValues={{...this.state.personalInformation}}
                     // submissionPrep={this.submissionPrep}

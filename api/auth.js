@@ -13,21 +13,11 @@ let store = require("../config/redux/store");
 
 module.exports = function(app, passport) {
 
-    app.post('/auth/token', function(req, res, next){
-        if(req.body.strategy){
-            passport.authenticate(req.body.strategy)(req,res,next);
-        }else{
-            passport.authenticate('local-login', {session:false})(req,res,next);
-        }
-
-    }, async function(req, res) {
-        let payload = {  uid: req.user.data.id };
-        if(req.query.includeUser){
-            await req.user.attachReferences();
-            payload.user = req.user.data;
-            delete payload.user.password;
-        }
-        let token = jwt.sign(payload, process.env.SECRET_KEY, { expiresIn: '3h' });
+    //TODO: buff up security so each user has their own secret key
+    //TODO: security key..... no hardcoded strings plzzzz (along with the comment above)
+    app.post('/auth/token', passport.authenticate('local-login', {session:false}), function(req, res) {
+        console.log(req.user);
+        let token = jwt.sign({  uid: req.user.data.id }, process.env.SECRET_KEY, { expiresIn: '3h' });
         res.json({token:token});
     });
 
@@ -41,7 +31,7 @@ module.exports = function(app, passport) {
 
     app.post("/auth/reset-password", function(req, res, next){
         User.findOne("email", req.body.email, function(user){
-            if(user.data && user.data.status !== "invited"){
+            if(user.data){
                 ResetRequest.findAll("user_id", user.get("id"), function(requests){
                     async.each(requests, function(request, callback){
                         request.delete(function(result){
@@ -55,11 +45,7 @@ module.exports = function(app, passport) {
                                 hash: bcrypt.hashSync(token, 10)
                             });
                             reset.create(function(err, newReset){
-                                let resetURL = store.getState().options.reset_url;
                                 let frontEndUrl = `${req.protocol}://${req.get('host')}/reset-password/${user.get("id")}/${token}`;
-                                if(resetURL){
-                                    frontEndUrl = `${resetURL}?uid=${user.get("id")}&resetToken=${token}`
-                                }
                                 res.json({message: "Success"});
                                 user.set("token", token);
                                 user.set("url", frontEndUrl);
@@ -108,10 +94,8 @@ module.exports = function(app, passport) {
 
     });
 
-
     app.post('/auth/session', function(req,res,next){
-
-        let cb = function(err, user, info) {
+        passport.authenticate('local-login', function(err, user, info) {
             if (err) { console.error(err); return res.json({"error" : "Invalid username or password"}); }
             if (!user) { console.error("no user"); return res.json({"error" : "Invalid username or password"}) }
             req.logIn(user, {session:true}, function(err) {
@@ -122,12 +106,7 @@ module.exports = function(app, passport) {
                     return next();
                 })
             });
-        };
-        if(req.body.strategy) {
-            passport.authenticate(req.body.strategy, cb)(req, res, next);
-        }else{
-            passport.authenticate('local-login', cb)(req, res, next);
-        }
+        })(req, res, next);
     },require("../middleware/role-session")(), function(req, res, next){
         let user_role = new Role({"id" : req.user.data.role_id});
         user_role.getPermissions(function(perms){
@@ -137,4 +116,4 @@ module.exports = function(app, passport) {
     });
 
 
-};
+    };

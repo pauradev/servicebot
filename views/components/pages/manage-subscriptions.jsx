@@ -14,8 +14,7 @@ import '../../../node_modules/react-bootstrap-table/dist/react-bootstrap-table-a
 import ModalRequestCancellation from "../elements/modals/modal-request-cancellation.jsx";
 import ModalManageCancellation from "../elements/modals/modal-manage-cancellation.jsx";
 import ModalDeleteInstance from "../elements/modals/modal-delete-instance.jsx";
-import {getFormattedDate} from "../utilities/date-format.jsx";
-import ReactTooltip from 'react-tooltip';
+import getSymbolFromCurrency from 'currency-symbol-map';
 let _ = require("lodash");
 
 class ManageSubscriptions extends React.Component {
@@ -39,7 +38,6 @@ class ManageSubscriptions extends React.Component {
         this.onCloseActionModal = this.onCloseActionModal.bind(this);
         this.rowActionsFormatter = this.rowActionsFormatter.bind(this);
         this.requestedByFormatter = this.requestedByFormatter.bind(this);
-        this.paymentFormatter = this.paymentFormatter.bind(this);
     }
 
     componentDidMount() {
@@ -123,7 +121,10 @@ class ManageSubscriptions extends React.Component {
     emailFormatter(cell, row){
         return (
             <div>
-                <span className="customer-email"><Link to={`/service-instance/${row.id}`}>{cell.users[0].email}</Link></span>
+                <div className="badge badge-xs">
+                    <img className="img-circle" src={`/api/v1/users/${row.user_id}/avatar`}/>
+                </div>
+                <span className="customer-email">&nbsp;&nbsp;{cell.users[0].email}</span>
             </div>
         );
     }
@@ -131,58 +132,41 @@ class ManageSubscriptions extends React.Component {
         //null check for the payment plan
         if(cell) {
             let interval = cell.interval;
-            if(interval === 'day') { interval = 'Daily'; }
-            else if (interval === 'week') { interval = 'Weekly'; }
-            else if (interval === 'month') { interval = 'Monthly'; }
-            else if (interval === 'year') { interval = 'Yearly'; }
+            if(interval == 'day') { interval = 'Daily'; }
+            else if (interval == 'week') { interval = 'Weekly'; }
+            else if (interval == 'month') { interval = 'Monthly'; }
+            else if (interval == 'year') { interval = 'Yearly'; }
 
             let type = row.type.toLowerCase();
             switch(type){
                 case 'subscription':
                     //return ( <div><span className="status-badge neutral" >{getBillingType(row)}</span> <span className="status-badge black" >{interval}</span></div> );
-                    return ( <span className="mc-badge"><i className="fa fa-circle micro-badge black" /> {interval}</span> );
+                    return ( <div><span className="status-badge black" >{interval}</span></div> );
                 case 'custom':
-                    return ( <span className="mc-badge"><i className="fa fa-circle micro-badge grey" /> {getBillingType(row)}</span> );
+                    return ( <span className="status-badge neutral">{getBillingType(row)}</span> );
                 case 'one_time':
-                    return ( <span className="mc-badge"><i className="fa fa-circle micro-badge grey" /> {getBillingType(row)}</span> );
+                    return ( <span className="status-badge neutral">{getBillingType(row)}</span> );
                 case 'split':
-                    return ( <span className="mc-badge"><i className="fa fa-circle micro-badge grey" /> {getBillingType(row)}</span> );
+                    return ( <span className="status-badge neutral">{getBillingType(row)}</span> );
                 default:
-                    return ( <span className="mc-badge"><i className="fa fa-circle micro-badge grey" /> {getBillingType(row)}</span> );
+                    return ( <span className="status-badge grey">{getBillingType(row)}</span> );
             }
         } else {
-            return ( <span className="mc-badge"><i className="fa fa-circle micro-badge grey" /> Missing</span> );
+            return ( <span className="status-badge grey">Missing</span> );
         }
 
     }
     typeDataValue(cell, row){
         if(cell) {
-            let interval = row.payment_plan.interval;
-            if(interval === 'day') { interval = 'Daily'; }
-            else if (interval === 'week') { interval = 'Weekly'; }
-            else if (interval === 'month') { interval = 'Monthly'; }
-            else if (interval === 'year') { interval = 'Yearly'; }
-            return (interval);
+            return (row.type);
         } else {
             return 'N/A';
         }
     }
-    statusDataValue(cell, row){
-        let status = cell;
-        if(status === 'running'){
-            let currentDate = new Date();
-            let trialEnd = new Date(row.trial_end * 1000);
-            if(currentDate < trialEnd) {
-                status = 'Trialing';
-            } else {
-                status = 'active';
-            }
-        }
-        return status;
-    }
     amountFormatter(cell, row){
         if(cell) {
-            return (<Price value={cell.amount} currency={cell.currency}/>);
+            let prefix = getSymbolFromCurrency(cell.currency);
+            return (<Price value={cell.amount} prefix={prefix}/>);
         } else {
             return ( <span className="status-badge red">No Plan</span> );
         }
@@ -190,22 +174,12 @@ class ManageSubscriptions extends React.Component {
     emailDataValue(cell){
         return cell.users[0].email;
     }
-    statusFormatter(cell, row){
+    statusFormatter(cell){
         switch (cell) {
             case 'requested':
-                return ( <span className='status-badge yellow' >Requested</span> );
+                return ( <span className='status-badge blue' >Requested</span> );
             case 'running':
-                //Get trial detail
-                let color = 'status-badge green';
-                let str = 'Active';
-                let currentDate = new Date();
-                let trialEnd = new Date(row.trial_end * 1000);
-                //Service is trialing if the expiration is after current date
-                if(currentDate < trialEnd) {
-                    str = 'Trialing';
-                    color = 'status-badge blue';
-                }
-                return ( <span className={color} >{str}</span> );
+                return ( <span className='status-badge green' >Running</span> );
             case 'waiting_cancellation':
                 return ( <span className='status-badge yellow' >Waiting Cancellation</span> );
             case 'cancelled':
@@ -214,40 +188,8 @@ class ManageSubscriptions extends React.Component {
                 return ( <span className='status-badge grey' >{cell}</span> );
         }
     }
-
-    paymentFormatter(cell, row) {
-        let uid = row.user_id;
-        let user = _.find(this.state.allUsers, function (user) {
-            return user.id === uid;
-        });
-        if(user.references.funds.length > 0) {
-            if(user.status === 'flagged') {
-                return (
-                    <span data-tip='Payment Failed' data-for='valid-card' className='status-badge yellow' ><i className="fa fa-credit-card"/> <i className="fa fa-flag"></i>
-                    <ReactTooltip id="flagged-card" aria-haspopup='true' delayShow={100}
-                                  role='date' place="left" effect="solid"/>
-                    </span>
-                );
-            } else {
-                return (
-                    <span data-tip='Paying - Valid Card' data-for='valid-card' className='status-badge green'><i className="fa fa-credit-card"/> <i className="fa fa-check"></i>
-                    <ReactTooltip id="valid-card" aria-haspopup='true' delayShow={100}
-                                  role='date' place="left" effect="solid"/>
-                    </span>
-                );
-            }
-        } else {
-            return ( <span className='status-badge grey'/> );
-        }
-    }
-
-    createdFormatter(cell, row){
-        let fullTime = `${getFormattedDate(cell, {time: true})} - Created: ${getFormattedDate(row.created_at, {time: true})}`;
-        return (<div className="datatable-date">
-            <span data-tip={fullTime} data-for='date-updated'>{getFormattedDate(cell)}</span>
-            <ReactTooltip id="date-updated" aria-haspopup='true' delayShow={200}
-                          role='date' place="left" effect="solid"/>
-        </div>);
+    createdFormatter(cell){
+        return ( <DateFormat date={cell} time/> );
     }
     requestedByFormatter(cell){
         if(cell && cell != null){
@@ -301,7 +243,7 @@ class ManageSubscriptions extends React.Component {
     render () {
         let self = this;
         let pageName = this.props.route.name;
-        let pageTitle = 'Manage Subscriptions';
+        let pageTitle = 'Manage your services here';
         let subtitle = 'View, edit, and manage your subscriptions';
 
         if(this.props.params.status) {
@@ -365,73 +307,69 @@ class ManageSubscriptions extends React.Component {
             };
             return (
                 <Authorizer permissions={["can_administrate", "can_manage"]}>
-                    <div className="page __manage-subscriptions">
+                    <Jumbotron pageName={pageName} subtitle={subtitle}/>
+                    <div className="page-service-instance">
                         <Content>
-                            <ContentTitle title={pageTitle}/>
-                            <ServiceBotTableBase
-                                rows={this.state.rows}
-                                fetchRows={this.fetchData}
-                                sortColumn="updated_at"
-                                sortOrder="desc"
-                            >
-                                <TableHeaderColumn isKey
-                                                   dataField='references'
-                                                   dataFormat={this.emailFormatter}
-                                                   dataSort={ true }
-                                                   filterValue={this.emailDataValue}
-                                                   width='150'>
-                                    Customer
-                                </TableHeaderColumn>
-                                <TableHeaderColumn dataField='name'
-                                                   dataFormat={this.nameFormatter}
-                                                   dataSort={ true }
-                                                   width='130'>
-                                    Subscribed to
-                                </TableHeaderColumn>
-                                <TableHeaderColumn dataField='payment_plan'
-                                                   dataFormat={this.amountFormatter}
-                                                   dataSort={ true }
-                                                   searchable={false}
-                                                   width='80'>
-                                    Price
-                                </TableHeaderColumn>
-                                <TableHeaderColumn dataField='payment_plan'
-                                                   dataFormat={this.typeFormatter}
-                                                   dataSort={ true }
-                                                   filterValue={this.typeDataValue}
-                                                   width='100'>
-                                    Type
-                                </TableHeaderColumn>
-                                <TableHeaderColumn dataField='status'
-                                                   dataFormat={this.statusFormatter}
-                                                   dataSort={ true }
-                                                   filterValue={this.statusDataValue}
-                                                   width='100'>
-                                    Status
-                                </TableHeaderColumn>
-                                <TableHeaderColumn dataField='payment'
-                                                   dataFormat={this.paymentFormatter}
-                                                   dataSort={ true }
-                                                   searchable={false}
-                                                   width='100'>
-                                    Payment
-                                </TableHeaderColumn>
-                                <TableHeaderColumn dataField='updated_at'
-                                                   dataFormat={this.createdFormatter}
-                                                   dataSort={ true }
-                                                   searchable={false}
-                                                   width='140'>
-                                    Updated
-                                </TableHeaderColumn>
-                                <TableHeaderColumn dataField='Actions'
-                                                   className={'action-column-header'}
-                                                   columnClassName={'action-column'}
-                                                   dataFormat={ this.rowActionsFormatter }
-                                                   width='80'
-                                                   searchable={false}>
-                                </TableHeaderColumn>
-                            </ServiceBotTableBase>
-
+                            <div className="row m-b-20">
+                                <div className="col-xs-12">
+                                    <ContentTitle icon="cog" title={pageTitle}/>
+                                    <ServiceBotTableBase
+                                        rows={this.state.rows}
+                                        fetchRows={this.fetchData}
+                                        sortColumn="updated_at"
+                                        sortOrder="desc"
+                                    >
+                                        <TableHeaderColumn isKey
+                                                           dataField='name'
+                                                           dataFormat={this.nameFormatter}
+                                                           dataSort={ true }
+                                                           width='130'>
+                                            Offering
+                                        </TableHeaderColumn>
+                                        <TableHeaderColumn dataField='references'
+                                                           dataFormat={this.emailFormatter}
+                                                           dataSort={ true }
+                                                           filterValue={this.emailDataValue}
+                                                           width='150'>
+                                            Email
+                                        </TableHeaderColumn>
+                                        <TableHeaderColumn dataField='payment_plan'
+                                                           dataFormat={this.amountFormatter}
+                                                           dataSort={ true }
+                                                           searchable={false}
+                                                           width='80'>
+                                            Amount
+                                        </TableHeaderColumn>
+                                        <TableHeaderColumn dataField='payment_plan'
+                                                           dataFormat={this.typeFormatter}
+                                                           dataSort={ true }
+                                                           filterValue={this.typeDataValue}
+                                                           width='100'>
+                                            Type
+                                        </TableHeaderColumn>
+                                        <TableHeaderColumn dataField='status'
+                                                           dataFormat={this.statusFormatter}
+                                                           dataSort={ true }
+                                                           width='100'>
+                                            Status
+                                        </TableHeaderColumn>
+                                        <TableHeaderColumn dataField='updated_at'
+                                                           dataFormat={this.createdFormatter}
+                                                           dataSort={ true }
+                                                           searchable={false}
+                                                           width='140'>
+                                            Updated
+                                        </TableHeaderColumn>
+                                        <TableHeaderColumn dataField='Actions'
+                                                           className={'action-column-header'}
+                                                           columnClassName={'action-column'}
+                                                           dataFormat={ this.rowActionsFormatter }
+                                                           width='80'
+                                                           searchable={false}>
+                                        </TableHeaderColumn>
+                                    </ServiceBotTableBase>
+                                </div>
+                            </div>
                             {renderModals()}
                         </Content>
                     </div>

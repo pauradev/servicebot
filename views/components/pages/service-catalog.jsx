@@ -18,11 +18,18 @@ class ServiceCatalog extends React.Component {
     }
 
     render () {
+        let self = this;
+        let pageName = this.props.route.name;
+        let breadcrumbs = [{name:'Home', link:'home'},{name:'My Services', link:'/my-services'},{name:'Service Catalog', link:null}];
         return(
             <Authorizer permissions="can_administrate">
-                <div className="page __service-catalog">
+                <Jumbotron pageName={pageName} location={this.props.location}/>
+                <div className="page-service-instance">
                     <Content>
-                        <ServiceCatalogList/>
+                        <div className="row m-b-20">
+                            <ServiceCatalogList/>
+                        </div>
+
                     </Content>
                 </div>
             </Authorizer>

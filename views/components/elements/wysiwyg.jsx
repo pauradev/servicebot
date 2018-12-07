@@ -1,29 +1,29 @@
 import React from 'react';
+import $ from "jquery";
 import "../../../public/js/scripts/redactor/redactor.min.css";
 import "../../../public/js/scripts/redactor/redactor.min.js";
 
+
 class Wysiwyg extends React.Component {
     constructor(props){
-        super(props);
+        super(props)
         this.insert = this.insert.bind(this);
-        this.state = {}
+
+        this.state = {
+        }
     }
 
     insert(content){
-        $R(this.refs.wysiwygArea, "insertion.insertRaw", content);
+        $(this.refs.wysiwygArea).redactor("buffer.set");
+        $(this.refs.wysiwygArea).redactor("insert.raw", content);
     }
 
     componentDidMount() {
         var self = this;
-        $R(this.refs.wysiwygArea, {
-            callbacks: {
-                changed: function(html)
-                {
-                    self.props.onChange(html);
-                }
-            }
+        $(this.refs.wysiwygArea).redactor();
+        $(this.refs.wysiwygArea).on('change.callback.redactor', function(e, data) {
+            self.props.onChange(e);
         });
-
 
     }
     render(){
@@ -40,13 +40,14 @@ class WysiwygRedux extends React.Component {
     }
 
     insert(content){
-        $R(this.refs[`wysiwyg_${this.props.name}`]).redactor("insert.raw", content);
+        $(this.refs[`wysiwyg_${this.props.name}`]).redactor("buffer.set");
+        $(this.refs[`wysiwyg_${this.props.name}`]).redactor("insert.raw", content);
     }
 
     componentDidMount() {
         var self = this;
-        $R(this.refs[`wysiwyg_${this.props.name}`]).redactor();
-        $R(this.refs[`wysiwyg_${this.props.name}`]).on('change.callback.redactor', function(e, data) {
+        $(this.refs[`wysiwyg_${this.props.name}`]).redactor();
+        $(this.refs[`wysiwyg_${this.props.name}`]).on('change.callback.redactor', function(e, data) {
             self.props.input.onChange(e);
         });
 

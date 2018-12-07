@@ -9,8 +9,7 @@ let ServiceCategory = require('../../../models/service-category');
 let Invoice = require('../../../models/invoice');
 let dispatchEvent = require("../../../config/redux/store").dispatchEvent;
 let stripe = require('../../../config/stripe');
-let Tier = require('../../../models/tier');
-let PaymentStructureTemplate = require('../../../models/payment-structure-template');
+
 
 module.exports = function(knex) {
 
@@ -60,19 +59,14 @@ module.exports = function(knex) {
 
         return promiseServiceCategory().then(function (category) {
             return new Promise(function (resolve, reject) {
-                stripe().connection.plans.list(req_params, async function (err, plans) {
+                stripe().connection.plans.list(req_params, function (err, plans) {
                     if(!err) {
-                        for(let plan of plans.data){
-                            await importServiceTemplate(category, plan).catch(err => console.error("error importing template", err));
-                        }
-                        // Promise.all(plans.data.map(function (plan) {
-                        //     return importServiceTemplate(category, plan).catch(function (err) {
-                        //         console.log(err);
-                        //         return Promise.resolve(true);
-                        //     });;
-                        // }
-                        // )
-                        // ).then(function () {
+                        Promise.all(plans.data.map(function (plan) {
+                            return importServiceTemplate(category, plan).catch(function (err) {
+                                console.log(err);
+                                return Promise.resolve(true);
+                            });;
+                        })).then(function () {
                             // Check for more, and recursively call importStripePlans
                             if (plans.has_more) {
                                 let last_plan = plans.data[plans.data.length - 1].id;
@@ -82,7 +76,7 @@ module.exports = function(knex) {
                                 console.log(`All plans have been imported.`);
                                 return resolve(true);
                             }
-
+                        });
                     } else {
                         console.log(err);
                         return resolve(true);
@@ -103,12 +97,14 @@ module.exports = function(knex) {
         if (last_id !== null) { req_params['starting_after'] = last_id; }
 
         return new Promise(function (resolve, reject) {
-            stripe().connection.subscriptions.list(req_params, async function (err, subscriptions) {
+            stripe().connection.subscriptions.list(req_params, function (err, subscriptions) {
                 if(!err) {
-                    for(let subscription of subscriptions.data){
-                        await importServiceInstance(subscription).catch(err => {console.error(err)})
-                    }
-
+                    Promise.all(subscriptions.data.map(function (subscription) {
+                        return importServiceInstance(subscription).catch(function (err) {
+                            console.log(err);
+                            return Promise.resolve(true);
+                        });
+                    })).then(function () {
                         // Check for more, and recursively call importStripePlans
                         if (subscriptions.has_more) {
                             let last_subscription = subscriptions["data"][subscriptions["data"].length - 1].id;
@@ -118,6 +114,7 @@ module.exports = function(knex) {
                             console.log(`All subscriptions have been imported.`);
                             return resolve(true);
                         }
+                    });
                 } else {
                     return reject('Cannot make the API call to retrieve Plans.');
                 }
@@ -207,7 +204,7 @@ module.exports = function(knex) {
 
     let importServiceTemplate = function (category, plan) {
         return new Promise(function (resolve, reject) {
-            ServiceTemplate.findOne('name', plan.name || plan.nickname || plan.id, function (template) {
+            ServiceTemplate.findOne('name', plan.id, function (template) {
                 if(template.data) {
                     return resolve(template);
                 } else {
@@ -215,33 +212,20 @@ module.exports = function(knex) {
                 }
             })
         }).then(function (template) {
-            return new Promise( async function (resolve, reject) {
+            return new Promise(function (resolve, reject) {
                 if(!template) {
                     let newPlan = Object.assign({}, plan);
                     delete newPlan.id;
-                    let newTemplate = {};
-                    newTemplate.category_id = category.data.id;
-                    newTemplate.created_by = 1;
-                    newTemplate.description = plan.name || plan.nickname || "Imported from Stripe";
-                    newTemplate.name = plan.name || plan.nickname || plan.id;
-                    newTemplate.published = true;
-                    try {
-                        let template = await ServiceTemplate.createPromise(newTemplate);
-                        let newTier = await Tier.createPromise({
-                            service_template_id: template.id,
-                            name: template.name + "-Tier"
-                        });
-                        let newPaymentStructure = await PaymentStructureTemplate.createPromise({
-                            trial_period_days: 0,
-                            ...newPlan,
-                            tier_id: newTier.id,
-                            type: "subscription"
-                        });
-                        resolve(template);
-                    } catch (e) {
-                        console.error("error while creating template", e);
-                        reject(e);
-                    }
+                    newPlan.category_id = category.data.id;
+                    newPlan.created_by = 1;
+                    newPlan.description = plan.name || plan.nickname || "Imported from Stripe";
+                    newPlan.name = plan.name || plan.nickname || plan.id;
+                    let template = new ServiceTemplate(newPlan);
+                    template.create((err, template) => {
+                        if(err){
+                            console.error(err);
+                        }
+                        return resolve(template); });
                 } else {
                     return resolve(template);
                 }
@@ -307,15 +291,13 @@ module.exports = function(knex) {
                 });
             });
         }).then(function (service) {
-            return new Promise(async function (resolve, reject) {
-                let plan = service.payment_plan;
-                let template =  (await ServiceTemplate.find({'name': plan.name || plan.nickname || plan.id}, true))[0];
+            return new Promise(function (resolve, reject) {
+                ServiceTemplate.findOne('name', service.payment_plan.id, function (template) {
                     if(template.data) {
-                        let paymentStructureTemplate = (await PaymentStructureTemplate.find({'tier_id': template.data.references.tiers[0].id}))[0];
                         service.service_id = template.data.id;
-                        service.payment_structure_template_id = paymentStructureTemplate.data.id;
                     }
                     return resolve(service);
+                });
             });
         }).then(function (service) {
             return new Promise(function (resolve, reject) {

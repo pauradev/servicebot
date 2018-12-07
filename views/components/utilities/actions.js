@@ -25,23 +25,21 @@ export const SET_NAV_CLASS = "SET_NAV_CLASS";
 export const SETUP_COMPLETE = "SETUP_COMPLETE";
 export const SHOW_MODAL = "SHOW_MODAL";
 export const HIDE_MODAL = "HIDE_MODAL";
-export const SET_HAS_OFFERING = "SET_HAS_OFFERING";
-
 /*
  * other constants
  */
 export function fetchUsers(uid = null, callback){
     let user = null;
     if(uid){
-        //
+        // console.log("redux action setUser", uid);
         Fetcher("/api/v1/users/own", "GET").then(function (response) {
-            //
+            // console.log("user response", response);
             if(!response.error && response.length){
                 user = response[0];
                 callback(null, user);
             }else{
                 callback(response.error)
-                //
+                // console.log("error fetching own user after login");
             }
         });
     }
@@ -132,7 +130,4 @@ export function showModal(component, hide, titleText, buttonText, icon, titleCol
 
 export function hideModal(){
     return {type: HIDE_MODAL}
-}
-export function setHasOffering(hasOffering){
-    return {type: SET_HAS_OFFERING, hasOffering}
 }

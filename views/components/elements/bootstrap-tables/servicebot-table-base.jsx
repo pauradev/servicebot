@@ -33,22 +33,22 @@ class ServiceBotTableBase extends React.Component {
 
     renderCustomClearSearchBtn(onClick) {
         return (
-            <button className='buttons _primary' onClick={ onClick }>Clear Search</button>
+            <button className='btn btn-default' onClick={ onClick }>Clear Search</button>
         );
     };
 
     renderExportCSVButton(onClick) {
         return (
-            <button className='buttons _primary _gray' onClick={ onClick }>Export</button>
+            <button className='btn btn-default' onClick={ onClick }>Export</button>
         );
     }
 
     renderCustomButtonGroup(props) {
         let self = this;
         return (
-            <ButtonGroup className='buttons-group __gap'>
+            <ButtonGroup className='servicebot-table-btn-group' sizeClass='btn-group-md'>
                 {self.props.createItemAction &&
-                <button {...self.props.createItemProps} type='button' className={ `buttons _primary _green` } onClick={() => {
+                <button {...self.props.createItemProps} type='button' className={ `btn btn-default` } onClick={() => {
                     self.props.createItemAction ? self.props.createItemAction() :
                         console.error('You must pass a prop "createItem" to ServiceBotTableBase component.');
                 }}><i className="fa fa-plus"/> {self.props.createItemLabel}
@@ -64,12 +64,12 @@ class ServiceBotTableBase extends React.Component {
 
     renderSizePerPageDropDown(props) {
         return (
-            <div className='buttons-group'>
+            <div className='btn-group'>
                 {
                     [25, 50, 100].map((n, idx) => {
                         const isActive = (n === props.currSizePerPage) ? 'active' : null;
                         return (
-                            <button key={ idx } type='button' className={ `buttons btn-default ${isActive}` }
+                            <button key={ idx } type='button' className={ `btn btn-default ${isActive}` }
                                     onClick={ () => props.changeSizePerPage(n) }>{ n }</button>
                         );
                     })

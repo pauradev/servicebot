@@ -1,6 +1,6 @@
 import React from 'react';
 import Load from '../../utilities/load.jsx';
-import {Fetcher} from "servicebot-base-form";
+import Fetcher from "../../utilities/fetcher.jsx";
 import ContentTitle from "../../layouts/content-title.jsx"
 import Buttons from "../buttons.jsx";
 import Alerts from "../alerts.jsx";
@@ -52,7 +52,7 @@ class ManagePermissionForm extends React.Component {
             managePermissionsUrl: `/api/v1/roles/manage-permissions`,
             permissionMap: {},
             getPermissionsUrl: '/api/v1/permissions',
-            permissions: [],
+            permissions: {},
             getRolesUrl: '/api/v1/roles',
             roles: {},
             loading: true,
@@ -69,20 +69,18 @@ class ManagePermissionForm extends React.Component {
         this.savePermissions = this.savePermissions.bind(this);
     }
 
-    async componentDidMount(){
-        await this.fetchManagePermissions();
-        await this.fetchPermissions();
-        await this.fetchRoles();
+    componentDidMount(){
+        this.fetchManagePermissions();
+        this.fetchPermissions();
+        this.fetchRoles();
     }
 
     fetchManagePermissions(){
         let self = this;
-       return Fetcher(self.state.managePermissionsUrl).then(function (response) {
+        Fetcher(self.state.managePermissionsUrl).then(function (response) {
             if(!response.error){
                 self.setState({permissionMap: response});
-                return response;
             }else{
-                console.error("ERRRR");
                 self.setState({loading: false});
             }
         });
@@ -90,12 +88,9 @@ class ManagePermissionForm extends React.Component {
 
     fetchPermissions(){
         let self = this;
-        return Fetcher(self.state.getPermissionsUrl).then(function (response) {
-
+        Fetcher(self.state.getPermissionsUrl).then(function (response) {
             if(!response.error){
-
                 self.setState({permissions: response});
-                return response;
             }else{
                 console.error("permissions response obj error", response);
                 self.setState({loading: false});
@@ -105,10 +100,9 @@ class ManagePermissionForm extends React.Component {
 
     fetchRoles(){
         let self = this;
-        return Fetcher(self.state.getRolesUrl).then(function (response) {
+        Fetcher(self.state.getRolesUrl).then(function (response) {
             if(!response.error){
                 self.setState({loading: false, roles: response});
-                return response
             }else{
                 console.error("roles response obj error", response);
                 self.setState({loading: false});
@@ -124,8 +118,8 @@ class ManagePermissionForm extends React.Component {
 
     getRolePermissions(role_id){
         let self = this;
-        let role = self.state.permissionMap.find(role => role.role_id === role_id);
-        return ( role.permission_ids );
+        let permissions = _.filter(self.state.permissionMap, function (role) {return (role.role_id == role_id)});
+        return ( permissions[0].permission_ids );
     }
 
     handleTogglePermission(data){
@@ -191,7 +185,7 @@ class ManagePermissionForm extends React.Component {
 
             return (
                 <div className="col-xs-12">
-                    <ContentTitle icon="cog" title="Manage permissions"/>
+                    <ContentTitle icon="cog" title="Manage all your permissions here"/>
 
                     <table className="table table-striped table-hover">
                         <thead>

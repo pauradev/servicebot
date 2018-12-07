@@ -210,9 +210,9 @@ class Inputs extends React.Component {
         if(type == "text" || type == "number" || type == "hidden" || type == "email" || type == "password"){
 
             return (
-                <div className={`sb-form-group${warning ? 'has-warning' : ''} ${error ? 'has-error' : ''} ${type == 'hidden' ? 'hidden' : ''}`}>
-                    {label && <label className="_label- text-capitalize">{label}</label>}
-                    <input className="_input-" maxLength={maxLength} type={type} placeholder={placeholder}
+                <div className={`form-group ${warning ? 'has-warning' : ''} ${error ? 'has-error' : ''} ${type == 'hidden' ? 'hidden' : ''}`}>
+                    {label && <label className="control-label text-capitalize">{label}</label>}
+                    <input className="form-control" maxLength={maxLength} type={type} placeholder={placeholder}
                            disabled={disabled} name={name} defaultValue={defaultValue} onChange={this.handleChange}/>
                     {error && <span className="help-block">{error}</span> }
                     {warning && <span className="help-block">{warning}</span> }
@@ -221,14 +221,12 @@ class Inputs extends React.Component {
         }else if(type == "price"){
             //TODO: Handle on load, change the price mask for editing forms
             return(
-                <div className={`sb-form-group ${warning ? 'has-warning' : ''} ${error ? 'has-error' : ''} ${type == 'hidden' ? 'hidden' : ''}`}>
-                    {label && <label className="_label- text-capitalize">{label}</label>}
+                <div className={`form-group ${warning ? 'has-warning' : ''} ${error ? 'has-error' : ''} ${type == 'hidden' ? 'hidden' : ''}`}>
+                    {label && <label className="control-label text-capitalize">{label}</label>}
                     <div className="price-input">
                         <span className="price-mask">{!isNaN(this.state.priceValue) && this.state.priceValue >= 0 ?
-
-                            `$${this.state.priceValue}` : `$${this.props.value/100}`}</span>
-                        <input className="_input- price-value" autoComplete="off" maxLength={maxLength} type="number" placeholder={placeholder}
-
+                            `${prefix + this.state.priceValue}` : `${prefix + this.props.value/100}`}</span>
+                        <input className="form-control price-value" autoComplete="off" maxLength={maxLength} type="number" placeholder={placeholder}
                                disabled={disabled} name={name} defaultValue={defaultValue || 0} onChange={this.handlePriceChange}/>
                     </div>
                     {error && <span className="help-block">{error}</span> }
@@ -238,18 +236,18 @@ class Inputs extends React.Component {
         }else if(type == "textarea"){
             let row  = this.props.row? this.props.row : 4;
             return (
-                <div className={`sb-form-group ${warning ? 'has-warning' : ''} ${error ? 'has-error' : ''}`}>
-                    {label && <label className="_label- text-capitalize">{label}</label>}
-                    <textarea className="_input-" name={name} defaultValue={defaultValue} rows={row} onChange={this.handleChange}/>
+                <div className={`form-group ${warning ? 'has-warning' : ''} ${error ? 'has-error' : ''}`}>
+                    {label && <label className="control-label text-capitalize">{label}</label>}
+                    <textarea className="form-control" name={name} defaultValue={defaultValue} rows={row} onChange={this.handleChange}/>
                     {error && <span className="help-block">{error}</span> }
                     {warning && <span className="help-block">{warning}</span> }
                 </div>
             )
         }else if(type == "select"){
             return (
-                <div className={`sb-form-group ${warning ? 'has-warning' : ''} ${error ? 'has-error' : ''}`}>
-                    {label && <label className="_label- text-capitalize">{label}</label>}
-                    <select className="_input-" disabled={disabled} defaultValue={defaultValue} name={name} onChange={this.handleChange}>
+                <div className={`form-group ${warning ? 'has-warning' : ''} ${error ? 'has-error' : ''}`}>
+                    {label && <label className="control-label text-capitalize">{label}</label>}
+                    <select className="form-control" disabled={disabled} defaultValue={defaultValue} name={name} onChange={this.handleChange}>
                         {this.props.value == null && defaultValue == null && !this.props.hideValue ?
                             <option value={null}>{''}</option> : ''
                         }
@@ -273,9 +271,9 @@ class Inputs extends React.Component {
         }else if(type == "bool" || type == "boolean") {
 
             return (
-                <div className={`sb-form-group ${warning ? 'has-warning' : ''} ${error ? 'has-error' : ''}`}>
-                    {label && <label className="_label- text-capitalize">{label}</label>}
-                    <select className="_input-" disabled={disabled} defaultValue={defaultValue} name={name} onChange={this.handleChange}>
+                <div className={`form-group ${warning ? 'has-warning' : ''} ${error ? 'has-error' : ''}`}>
+                    {label && <label className="control-label text-capitalize">{label}</label>}
+                    <select className="form-control" disabled={disabled} defaultValue={defaultValue} name={name} onChange={this.handleChange}>
                         <option value={true}>True</option>
                         <option value={false}>False</option>
                     </select>
@@ -286,9 +284,9 @@ class Inputs extends React.Component {
 
         }else if(type == "checkbox"){
             return (
-                <div className={`sb-form-group ${error ? 'has-error' : ''}`}>
-                    {label && <label className="_label-">{label}</label>}
-                    <input className="_input-" type={type} name={this.props.name} defaultChecked={this.props.defaultValue == 'true'} onChange={this.handleChange}/>
+                <div className={`form-group ${error ? 'has-error' : ''}`}>
+                    {label && <label className="control-label">{label}</label>}
+                    <input className="form-control" type={type} name={this.props.name} defaultChecked={this.props.defaultValue == 'true'} onChange={this.handleChange}/>
                     {this.props.error && <span className="help-block">{this.props.error}</span> }
                 </div>
             );
@@ -296,13 +294,13 @@ class Inputs extends React.Component {
 
             return (
                 <div key={`color_picker_${this.state.name}`} id={`color_picker_${this.state.name}`}
-                     className={`sb-form-group color-picker-input ${error ? 'has-error' : ''}`}>
-                    {label && <label className="_label- text-capitalize">{label}</label>}
+                     className={`form-group color-picker-input ${error ? 'has-error' : ''}`}>
+                    {label && <label className="control-label text-capitalize">{label}</label>}
                     <div className="ColorPickerPreview"
                          style={{backgroundColor: this.state.value, width: 50+'px', height: 50+'px', cursor: 'pointer', borderRadius: 5+'px'}}
                          onClick={this.handleShowPicker}/>
                     <span className="custom-color-picker" onClick={this.handleShowPicker}><i className="fa fa-edit"/></span>
-                    <input id={`color_picker_${this.state.name}_input`} className="_input-"
+                    <input id={`color_picker_${this.state.name}_input`} className="form-control"
                            type="text" name={this.state.name} style={{display: 'none'}}
                            value={this.state.value} onFocus={this.handleShowPicker} onChange={this.props.onChange}/>
                     { this.state.showPicker &&

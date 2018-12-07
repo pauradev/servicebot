@@ -15,7 +15,7 @@ InstanceProperty.getByTemplateId = function(templateId, callback){
                 callback(entities);
             })
             .catch(function(err){
-                console.error(err);
+                console.log(err);
             });
     });
 

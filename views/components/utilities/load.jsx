@@ -7,23 +7,12 @@ class Load extends React.Component {
         this.state = {
             type: this.props.type || 'content',
             message: "Loading...",
-            loadState: "loading",
-            show: false,
+            loadState: "loading"
         };
     }
 
     componentDidMount() {
         let self = this;
-        let {timeout, delayed, show} = this.props;
-
-        if(delayed !== false){
-            this.delayed = setTimeout(function () {
-                self.setState({
-                    show: true
-                })
-            }, 300)
-        }
-
         if(this.props.timeout !== false ){
             this.timeout = setTimeout(function(){
                 self.setState({message: "There seems to be a problem in processing your request. Please try again.", loadState: "done" });
@@ -33,21 +22,46 @@ class Load extends React.Component {
 
     componentWillUnmount() {
         clearTimeout(this.timeout);
-        clearTimeout(this.delayed);
     }
 
     render () {
 
-        let {timeout, delayed, show} = this.state;
-        if(show){
-            return(
-                <div className="loader"><div className="lds-ellipsis"><div></div><div></div><div></div><div></div></div></div>
-            );
-        }else{
-            return(
-                <div/>
-            )
+        let style={};
+        let loadingStyle={};
+        if (this.state.type == 'content' || this.state.type == 'dataform'){
+            if(this.state.loadState == 'loading'){
+                loadingStyle={
+                    position: 'absolute',
+                    top: '50%',
+                    left: '47%',
+                    transform: 'translate(-50%,-50%)',
+                    height: '80px',
+                    width: '80px',
+                    zIndex: 999999
+                };
+            }
+        }else if(this.state.type == 'button'){
+            if(this.state.loadState == 'loading'){
+                loadingStyle={
+                    height: '20px',
+                    width: '20px'
+                };
+            }
+        }else if(this.state.type == 'avatar'){
+            if(this.state.loadState == 'loading'){
+                loadingStyle={
+                    height: '83px',
+                    width: '83px'
+                };
+            }
         }
+
+        return(
+            <div className="loader" style={style}>
+                <div className={this.state.loadState} style={loadingStyle}></div>
+                <p className={`help-block m-b-0 ${this.state.loadState}`}>{this.state.message}</p>
+            </div>
+        );
     }
 }
 

@@ -1,9 +1,13 @@
 import React from 'react';
-import {ServicebotBaseForm, widgetField} from "servicebot-base-form";
+import Fetcher from "../../utilities/fetcher.jsx"
+import ServiceBotBaseForm from "./servicebot-base-form.jsx";
+import Alerts from '../alerts.jsx';
 import {required, url} from 'redux-form-validators'
 import {Field,FieldArray} from 'redux-form'
 import Buttons from "../buttons.jsx";
 import Modal from '../../utilities/modal.jsx';
+import Jumbotron from '../../layouts/jumbotron.jsx';
+import {widgetField} from "./servicebot-base-field.jsx";
 import consume from "pluginbot-react/dist/consume";
 
 
@@ -35,7 +39,7 @@ let renderCustomProperty = (props) => {
                     }else{
                         if(formJSON[index].data && formJSON[index].data.value){
                             return (
-                                <div className={`sb-form-groupform-group-flex`}>
+                                <div className={`form-group form-group-flex`}>
                                     {(formJSON[index].prop_label && formJSON[index].type !== 'hidden') && <label className="control-label form-label-flex-md">{formJSON[index].prop_label}</label>}
                                     <div className="form-input-flex">
                                         <p>{formJSON[index].data.value}</p>
@@ -60,7 +64,8 @@ renderCustomProperty = consume("widget")(renderCustomProperty);
 
 
 function CustomFieldEditForm(props) {
-        let properties = props.instance.references.service_instance_properties;
+    console.log(props.instance);
+    let properties = props.instance.references.service_instance_properties;
     return (
         <form>
             <FieldArray name="service_instance_properties" component={renderCustomProperty}
@@ -85,7 +90,7 @@ function ModalEditProperties(props){
     return (
         <Modal modalTitle={"Edit Properties"} icon="fa-plus" hideCloseBtn={false} show={show} hide={hide} hideFooter={false}>
             <div className="p-20">
-                <ServicebotBaseForm
+                <ServiceBotBaseForm
                     form={CustomFieldEditForm}
                     //todo: is there a way to not need initial values to reference a prop name? (for array of X cases)
                     initialValues={{"service_instance_properties" : instance.references.service_instance_properties}}

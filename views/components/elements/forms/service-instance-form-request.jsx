@@ -13,11 +13,12 @@ import {
 import {connect} from "react-redux";
 import {RenderWidget, WidgetList, widgets, SelectWidget} from "../../utilities/widgets";
 import {Authorizer, isAuthorized} from "../../utilities/authorizer.jsx";
-import {inputField, selectField, widgetField, priceField} from "servicebot-base-form";
+import {inputField, selectField, widgetField, priceField} from "./servicebot-base-field.jsx";
 import {CardSection} from "../../elements/forms/billing-settings-form.jsx";
+import getSymbolFromCurrency from 'currency-symbol-map'
 
 import {Price} from "../../utilities/price.jsx";
-import {Fetcher} from "servicebot-base-form";
+import Fetcher from "../../utilities/fetcher.jsx";
 import ModalUserLogin from "../modals/modal-user-login.jsx";
 import {setUid, fetchUsers, setUser} from "../../utilities/actions";
 import {required, email, numericality, length} from 'redux-form-validators'
@@ -27,7 +28,7 @@ import cookie from 'react-cookie';
 
 let _ = require("lodash");
 
-import {ServicebotBaseForm} from "servicebot-base-form";
+import ServiceBotBaseForm from "./servicebot-base-form.jsx";
 import {getPrice} from "../../../../lib/handleInputs";
 import values from 'object.values';
 
@@ -71,7 +72,7 @@ let renderCustomProperty = (props) => {
                     } else {
                         if (formJSON[index].data && formJSON[index].data.value) {
                             return (
-                                <div className={`sb-form-groupform-group-flex`}>
+                                <div className={`form-group form-group-flex`}>
                                     {(formJSON[index].prop_label && formJSON[index].type !== 'hidden') && <label
                                         className="control-label form-label-flex-md">{formJSON[index].prop_label}</label>}
                                     <div className="form-input-flex">
@@ -120,6 +121,7 @@ class ServiceRequestForm extends React.Component {
         let getRequestText = () => {
             let serType = formJSON.type;
             let trial = formJSON.trial_period_days !== 0;
+            let prefix = getSymbolFromCurrency(formJSON.currency);
             if (trial) {
                 return ("Get your Free Trial")
             }
@@ -127,20 +129,20 @@ class ServiceRequestForm extends React.Component {
                 if (serType === "subscription") {
                     return (
                         <span>{"Subscribe "}
-                            <Price value={newPrice} currency={formJSON.currency}/>
+                            <Price value={newPrice} prefix={prefix}/>
                             {formJSON.interval_count == 1 ? ' /' : ' / ' + formJSON.interval_count} {' ' + formJSON.interval}
                     </span>
                     );
                 } else if (serType === "one_time") {
                     return (
-                        <span>{"Buy Now"} <Price value={newPrice} currency={formJSON.currency}/></span>
+                        <span>{"Buy Now"} <Price value={newPrice} prefix={prefix}/></span>
                     );
                 } else if (serType === "custom") {
                     return ("Request");
                 } else if (serType === "split") {
                     return ("Buy Now");
                 } else {
-                    return (<span><Price value={newPrice} currency={formJSON.currency}/></span>)
+                    return (<span><Price value={newPrice} prefix={prefix}/></span>)
                 }
             }
         };
@@ -209,7 +211,7 @@ class ServiceRequestForm extends React.Component {
                                     formJSON={formJSON.references.service_template_properties}/>
                     </FormSection>
 
-                    <button className="buttons btn-rounded btn-primary btn-bar submit-request" type="submit" value="submit">
+                    <button className="btn btn-rounded btn-primary btn-bar submit-request" type="submit" value="submit">
                         {getRequestText()}
                     </button>
                     {error &&
@@ -427,7 +429,7 @@ class ServiceInstanceForm extends React.Component {
                 <CardSection/>}
 
 
-                <ServicebotBaseForm
+                <ServiceBotBaseForm
                     form={ServiceRequestForm}
                     initialValues={initialValues}
                     initialRequests={initialRequests}

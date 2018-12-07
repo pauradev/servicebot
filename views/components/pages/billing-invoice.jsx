@@ -18,12 +18,18 @@ class BillingInvoice extends React.Component {
 
     }
     render () {
-        let { params: { invoiceId }} = this.props
+        var self = this;
+        let pageName = self.props.route.name;
+        let breadcrumbs = [{name:'Home', link:'home'},{name:'My Services', link:'/my-services'},{name:pageName, link:null}];
         return(
             <Authorizer>
-                <div className="page __billing-invoice">
+                <Jumbotron pageName={pageName} location={this.props.location}/>
+                <div className="page-service-instance">
                     <Content>
-                        <BillingInvoiceList invoiceId={invoiceId}/>
+                        <div className="row m-b-20">
+                            <BillingInvoiceList invoiceId={this.props.params.invoiceId}/>
+                        </div>
+
                     </Content>
                 </div>
             </Authorizer>

@@ -18,14 +18,16 @@ import {connect} from "react-redux";
 import {RenderWidget, WidgetList, PriceBreakdown, widgets} from "../../utilities/widgets";
 import {WysiwygRedux} from "../../elements/wysiwyg.jsx";
 import FileUploadForm from "./file-upload-form.jsx";
-import {addAlert, dismissAlert} from "../../utilities/actions";
 import {
-    ServicebotBaseForm, inputField,
+    inputField,
     selectField,
     OnOffToggleField,
     iconToggleField,
-    priceField
-} from "servicebot-base-form";
+    priceField,
+    priceToCents
+} from "./servicebot-base-field.jsx";
+import {addAlert, dismissAlert} from "../../utilities/actions";
+import ServiceBotBaseForm from "./servicebot-base-form.jsx";
 import SVGIcons from "../../utilities/svg-icons.jsx";
 import Load from "../../utilities/load.jsx";
 
@@ -59,10 +61,10 @@ function renderSplits({fields, meta: {error, submitFailed}}) {
 
     return (
         <div>
-            <div className="sb-form-groupform-group-flex">
+            <div className="form-group form-group-flex">
                 <lable className="control-label form-label-flex-md">Number of payments</lable>
                 <div className="form-input-flex">
-                    <input className="_input-" type="number" defaultValue={fields.length} onChange={onAdd}/>
+                    <input className="form-control" type="number" defaultValue={fields.length} onChange={onAdd}/>
                     {submitFailed && error && <span>{error}</span>}
                 </div>
             </div>
@@ -70,7 +72,7 @@ function renderSplits({fields, meta: {error, submitFailed}}) {
             <ul className="split-payment-items">
                 {fields.map((member, index) => (
                     <li className="split-payment-item" key={index}>
-                        <button className="buttons btn-rounded custom-field-button iconToggleField"
+                        <button className="btn btn-rounded custom-field-button iconToggleField"
                                 id="split-payment-delete-button" onClick={() => fields.remove(index)}
                                 type="button" title="Remove Payment"><span className="itf-icon"><i
                             className="fa fa-close"/></span></button>
@@ -123,9 +125,12 @@ class CustomField extends React.Component {
             willAutoFocus, index, typeValue, member, myValues, privateValue, requiredValue, promptValue, configValue,
             setPrivate, setRequired, setPrompt, changePrivate, changeRequired, changePrompt, templateType
         } = props;
+        let machineName;
 
         if (myValues.prop_label) {
             willAutoFocus = false;
+            machineName = slug(myValues.prop_label, {lower: true});
+
         }
         return (
             <div className="custom-property-fields">
@@ -303,7 +308,7 @@ class renderCustomProperty extends React.Component {
                                 {/*{fields.get(index).prop_label ?*/}
                                 {/*<p>{fields.get(index).prop_label}</p> : <p>Field #{index + 1}</p>*/}
                                 {/*}*/}
-                                <button className="buttons btn-rounded custom-field-button iconToggleField"
+                                <button className="btn btn-rounded custom-field-button iconToggleField"
                                         id="custom-field-delete-button"
                                         type="button"
                                         title="Remove Field"
@@ -316,11 +321,11 @@ class renderCustomProperty extends React.Component {
                         </li>
                     )}
                     <li className="custom-field-item">
-                        <div className="sb-form-groupform-group-flex">
+                        <div className="form-group form-group-flex">
                             <input className="form-control custom-property-add-field-toggle" autoFocus={false}
                                    placeholder="Add Custom Field ..." onClick={this.onAdd}/>
                         </div>
-                        {/*<button className="buttons btn-rounded" type="button" onClick={this.onAdd}>Add Field</button>*/}
+                        {/*<button className="btn btn-rounded" type="button" onClick={this.onAdd}>Add Field</button>*/}
                         {touched && error && <span>{error}</span>}
                     </li>
                 </ul>
@@ -390,8 +395,7 @@ class TemplateForm extends React.Component {
                                component={inputField} label="Summary"
                                validate={[required()]}
                         />
-                        <div className="sb-form-groupform-group-flex">
-
+                        <div className="form-group form-group-flex">
                             <Field name="details" type="text"
                                    component={WysiwygRedux} label="Details"
                             />
@@ -469,7 +473,7 @@ class TemplateForm extends React.Component {
                                            component={inputField} label="Trial Period (Days)"
                                            validate={required()}
                                     />
-                                    <div className="sb-form-groupform-group-flex">
+                                    <div className="form-group form-group-flex">
                                         <label className="control-label form-label-flex-md" htmlFor="type">Bill
                                             Customer Every</label>
                                         <Field name="interval_count" type="number"
@@ -558,9 +562,9 @@ class TemplateForm extends React.Component {
                                 {/*inputs={props.formJSON.references.service_template_properties}/>*/}
                                 {/*}*/}
                                 <div id="service-submission-box" className="button-box right">
-                                    <Link className="buttons btn-rounded btn-default" to={'/manage-catalog/list'}>Go
+                                    <Link className="btn btn-rounded btn-default" to={'/manage-catalog/list'}>Go
                                         Back</Link>
-                                    <button className="buttons _primary" type="submit">
+                                    <button className="btn btn-rounded btn-primary" type="submit">
                                         Submit
                                     </button>
                                 </div>
@@ -652,7 +656,7 @@ class ServiceTemplateForm extends React.Component {
     submissionPrep(values) {
         //remove id's for duplicate template operation
         if (this.props.params.duplicate) {
-
+            console.log("We have a duplicate and we want to remove id");
             delete values.id;
             values.references.service_template_properties = values.references.service_template_properties.map(prop => {
                 if (prop.id) {
@@ -746,7 +750,7 @@ class ServiceTemplateForm extends React.Component {
                             }
                         </div>
                         <div className="col-md-9">
-                            <ServicebotBaseForm
+                            <ServiceBotBaseForm
                                 form={TemplateForm}
                                 formName={TEMPLATE_FORM_NAME}
                                 initialValues={initialValues}

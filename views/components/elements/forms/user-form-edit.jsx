@@ -2,10 +2,13 @@ import React from 'react';
 import {Link} from 'react-router';
 import Load from '../../utilities/load.jsx';
 import Authorizer from "../../utilities/authorizer.jsx";
+import Inputs from "../../utilities/inputs.jsx";
 import Buttons from "../buttons.jsx";
+import {DataForm} from "../../utilities/data-form.jsx";
 import DateFormat from '../../utilities/date-format.jsx';
 import ImageUploader from '../../utilities/image-uploader.jsx';
-import {ServicebotBaseForm, inputField} from "servicebot-base-form";
+import ServiceBotBaseForm from "./servicebot-base-form.jsx";
+import {inputField} from "./servicebot-base-field.jsx";
 import {Field,} from 'redux-form';
 import { required, email, numericality, length } from 'redux-form-validators';
 
@@ -60,7 +63,7 @@ class UserFormEdit extends React.Component {
                 <div className="alert alert-success" role="alert">
                     <i className="fa fa-check-circle"/>
                     <Authorizer permissions="can_administrate">
-                        <Link to="/manage-users" className="buttons btn-success btn-outline btn-rounded btn-sm pull-right">Back to Manage Users</Link>
+                        <Link to="/manage-users" className="btn btn-success btn-outline btn-rounded btn-sm pull-right">Back to Manage Users</Link>
                     </Authorizer>
                     Your user profile has been updated.
                 </div>
@@ -117,7 +120,7 @@ class UserFormEdit extends React.Component {
                                 </div>
                                 <div id="add-category-form" className="col-md-12">
                                     <div className="row">
-                                        <ServicebotBaseForm
+                                        <ServiceBotBaseForm
                                             form={userFormElements.bind(this)}
                                             initialRequests = {initialRequests}
                                             validations={validations}

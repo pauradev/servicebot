@@ -1,19 +1,19 @@
 import React from 'react';
 import {Link, browserHistory} from 'react-router';
-import {isAuthorized} from "../utilities/authorizer.jsx";
+import {Authorizer, isAuthorized} from "../utilities/authorizer.jsx";
 import Load from "../utilities/load.jsx";
 import Fetcher from '../utilities/fetcher.jsx';
 import Dropdown from "../elements/dropdown.jsx";
-import {TableHeaderColumn} from 'react-bootstrap-table';
+import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';
+import {Price, serviceTypeFormatter} from "../utilities/price.jsx";
 import {getFormattedDate} from "../utilities/date-format.jsx";
 import {ServiceBotTableBase} from '../elements/bootstrap-tables/servicebot-table-base.jsx';
 import '../../../node_modules/react-bootstrap-table/dist/react-bootstrap-table-all.min.css';
 import ModalPublishingTemplate from "../elements/modals/modal-publishing-template.jsx";
 import ModalDeleteTemplate from "../elements/modals/modal-delete-template.jsx";
 import ModalEmbedTemplate from "../elements/modals/modal-embed-template.jsx";
-import ReactTooltip from 'react-tooltip';
-import ContentTitle from "../layouts/content-title.jsx";
-import Content from "../layouts/content.jsx";
+
+import getSymbolFromCurrency from 'currency-symbol-map'
 import {connect} from "react-redux";
 
 class ManageCatalogList extends React.Component {
@@ -37,7 +37,9 @@ class ManageCatalogList extends React.Component {
         this.onClosePublishingModal = this.onClosePublishingModal.bind(this);
         this.onOpenDeleteModal = this.onOpenDeleteModal.bind(this);
         this.onCloseDeleteModal = this.onCloseDeleteModal.bind(this);
+        this.onOpenEmbedModal = this.onOpenEmbedModal.bind(this);
         this.onCloseEmbedModal = this.onCloseEmbedModal.bind(this);
+
         this.rowActionsFormatter = this.rowActionsFormatter.bind(this);
     }
 
@@ -86,32 +88,36 @@ class ManageCatalogList extends React.Component {
         this.setState({embedModal: false, currentDataObject: {}, lastFetch: Date.now()});
     }
 
+    onOpenEmbedModal(row){
+        this.setState({embedModal: true, currentDataObject: row});
+    }
+
 
     /**
      * Cell formatters
      * Formats each cell data by passing the function as the dataFormat prop in TableHeaderColumn
      */
     nameFormatter(cell, row){
-        let numTiers = row.references.tiers.length;
-        let str = 'Tiers';
-        if(numTiers === 1) {
-            str = 'Tier';
-        }
-        return ( <Link to={`/manage-catalog/${row.id}`}>{cell} <span className="status-badge faded" >{numTiers} {str}</span></Link> );
+        return ( <Link to={`/manage-catalog/${row.id}`}>{cell}</Link> );
     }
-
+    priceFormatter(cell, row){
+        let prefix = getSymbolFromCurrency(row.currency);
+        return ( <Price value={cell} prefix={prefix}/> );
+    }
+    paymentTypeFormatter(cell, row){
+        return ( serviceTypeFormatter(row) );
+    }
+    categoryFormatter(cell){
+        return ( cell.service_categories[0].name );
+    }
     publishedFormatter(cell){
         let color_class = 'status-badge ';
-        color_class += cell ? 'green' : 'grey';
-        return ( `<span class="${color_class}" >${cell ? 'Live' : 'Draft'}</span>` );
+        color_class += cell ? 'green' : 'red';
+        return ( `<span class="${color_class}" >${cell ? 'Published' : 'Unpublished'}</span>` );
+        // return ( cell ? 'Published' : 'Unpublished' );
     }
     createdFormatter(cell){
-        return (<div className="datatable-date">
-                    <span data-tip={getFormattedDate(cell, {time: true})} data-for='date-updated'>{getFormattedDate(cell)}</span>
-                    <ReactTooltip id="date-updated" aria-haspopup='true' delayShow={400}
-                                  role='date' place="left" effect="solid"/>
-                </div>);
-        //return (getFormattedDate(cell, {time: true}));
+        return (getFormattedDate(cell, {time: true}));
     }
     rowActionsFormatter(cell, row){
         let self = this;
@@ -135,11 +141,16 @@ class ManageCatalogList extends React.Component {
                         action: () => {browserHistory.push(`/service-catalog/${row.id}/request`)},
                     },
                     {
+                        type: "button",
+                        label: 'Embed Request Form',
+                        action: () => {self.onOpenEmbedModal(row)},
+                    },
+                    {
                         type: "divider"
                     },
                     {
                         type: "button",
-                        label: row.published ? 'Set Draft' : 'Set Live',
+                        label: row.published ? 'Unpublish Item' : 'Publish Item',
                         action: () => {self.onOpenPublishingModal(row)},
                     },
                     {
@@ -148,7 +159,7 @@ class ManageCatalogList extends React.Component {
                         action: () => {self.onOpenDeleteModal(row)},
                     },
                 ].filter(option => {
-                    if(!self.props.provider && (option.label === "Request for User" || option.label === "Set Live")){
+                    if(!self.props.provider && (option.label === "Request for User" || option.label === "Publish Item")){
                         return false;
                     }
                     return true;
@@ -158,6 +169,7 @@ class ManageCatalogList extends React.Component {
     }
 
     render () {
+        let pageName = this.props.route.name;
         let renderModals = ()=> {
             if (this.state.embedModal) {
                 return(
@@ -187,50 +199,50 @@ class ManageCatalogList extends React.Component {
             return ( <Load/> );
         } else {
             return (
-                <div className="page __manage-services">
-                    <Content>
-                        <ContentTitle title="Manage Services"/>
+                <div className="row m-b-20">
+                    <div className="col-xs-12">
                         <ServiceBotTableBase
                             rows={this.state.rows}
                             createItemAction={ () => {browserHistory.push('/manage-catalog/create')} }
-                            createItemLabel={'Create Service'}
+                            createItemLabel={'Create Product / Service'}
                             fetchRows={this.fetchData}
                             sortColumn="updated_at"
-                            sortOrder="desc">
+                            sortOrder="desc"
+                        >
                             <TableHeaderColumn isKey
                                             dataField='name'
                                                dataSort={ true }
                                                dataFormat={ this.nameFormatter }
-                                               width={`200px`}>
-                                Service Name
+                                               width={200}>
+                                Product / Service Name
                             </TableHeaderColumn>
-                            {/*<TableHeaderColumn dataField='Tiers'*/}
-                                               {/*dataSort={ true }*/}
-                                               {/*dataFormat={ this.tierFormatter }*/}
-                                               {/*searchable={false}*/}
-                                               {/*width={50}>*/}
-                                {/*Tiers*/}
-                            {/*</TableHeaderColumn>*/}
-                            {/*<TableHeaderColumn dataField='type'*/}
-                                               {/*dataSort={ true }*/}
-                                               {/*dataFormat={ this.paymentTypeFormatter }*/}
-                                               {/*searchable={false}*/}
-                                               {/*width={100}>*/}
-                                {/*Type*/}
-                            {/*</TableHeaderColumn>*/}
-                            {/*<TableHeaderColumn dataField='references'*/}
-                                               {/*dataSort={ true }*/}
-                                               {/*dataFormat={ this.categoryFormatter }*/}
-                                               {/*filterFormatted*/}
-                                               {/*width={120}>*/}
-                                {/*Category*/}
-                            {/*</TableHeaderColumn>*/}
+                            <TableHeaderColumn dataField='amount'
+                                               dataSort={ true }
+                                               dataFormat={ this.priceFormatter }
+                                               searchable={false}
+                                               width={100}>
+                                Pricing
+                            </TableHeaderColumn>
+                            <TableHeaderColumn dataField='type'
+                                               dataSort={ true }
+                                               dataFormat={ this.paymentTypeFormatter }
+                                               searchable={false}
+                                               width={100}>
+                                Type
+                            </TableHeaderColumn>
+                            <TableHeaderColumn dataField='references'
+                                               dataSort={ true }
+                                               dataFormat={ this.categoryFormatter }
+                                               filterFormatted
+                                               width={120}>
+                                Category
+                            </TableHeaderColumn>
                             <TableHeaderColumn dataField='published'
                                                dataSort={ true }
                                                dataFormat={ this.publishedFormatter }
                                                searchable={false}
                                                filterFormatted
-                                               width={`100px`}>
+                                               width={100}>
                                 Status
                             </TableHeaderColumn>
                             <TableHeaderColumn dataField='updated_at'
@@ -238,7 +250,7 @@ class ManageCatalogList extends React.Component {
                                                dataFormat={ this.createdFormatter }
                                                searchable={false}
                                                filterFormatted
-                                               width={`150px`}>
+                                               width={150}>
                                 Updated At
                             </TableHeaderColumn>
                             <TableHeaderColumn dataField='Actions'
@@ -246,11 +258,11 @@ class ManageCatalogList extends React.Component {
                                                columnClassName={'action-column'}
                                                dataFormat={ this.rowActionsFormatter }
                                                searchable={false}
-                                               width={`100px`}>
+                                               width={100}>
                             </TableHeaderColumn>
                         </ServiceBotTableBase>
                         {renderModals()}
-                    </Content>
+                    </div>
                 </div>
             );
         }

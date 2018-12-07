@@ -168,7 +168,7 @@
 /*}*/
 
 .additional-charges-total {
-    border-top: 1px dotted #d9030338;
+    border-top: 2px solid #d90303;
 }
 .additional-charges-total.dark {
     border-top: 0;

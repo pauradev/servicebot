@@ -35,8 +35,7 @@ module.exports = function (router) {
                 } else {
                     //todo: make less hardcoded.. maybe seperate api calls again
                     if(req.params.id == "brand_logo"){
-                        //return res.sendFile(path.resolve(__dirname, "../public/assets/logos/v1/servicebot-logo-full-white.png"));
-                        return res.sendFile(path.resolve(__dirname, "../public/assets/logos/v1/servicebot-logo-full-blue.png"));
+                        return res.sendFile(path.resolve(__dirname, "../public/assets/logos/v1/servicebot-logo-full-white.png"));
                     } else if(req.params.id == "loader_logo") {
                         return res.sendFile(path.resolve(__dirname, "../public/assets/logos/v1/servicebot-logo-full-blue.png"));
                     } else {

@@ -21,12 +21,18 @@ class BillingSettings extends React.Component {
 
     }
     render () {
+        let pageName = this.props.route.name;
         let spk = cookie.load("spk");
         return(
             <Authorizer>
-                <div className="page __manage-billing-settings">
+                <Jumbotron pageName={pageName} location={this.props.location}/>
+                <div className="page-service-instance">
                     <Content>
-                        <BillingForm uid={this.props.uid} spk={spk}/>
+                        <div className="row m-b-20">
+                            <div className="col-md-10 col-lg-8 col-sm-12 col-md-offset-1 col-lg-offset-2">
+                                <BillingForm uid={this.props.uid} spk={spk}/>
+                            </div>
+                        </div>
                     </Content>
                 </div>
             </Authorizer>

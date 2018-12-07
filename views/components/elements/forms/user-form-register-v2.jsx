@@ -3,7 +3,7 @@ import Load from '../../utilities/load.jsx';
 import Inputs from "../../utilities/inputsV2.jsx";
 import { formBuilder } from "../../utilities/form-builder";
 import Buttons from "../../elements/buttons.jsx";
-import {Fetcher} from "servicebot-base-form";
+import Fetcher from "../../utilities/fetcher.jsx";
 let _ = require("lodash");
 
 class UserRegisterForm extends React.Component {

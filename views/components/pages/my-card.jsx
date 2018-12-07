@@ -24,9 +24,15 @@ class MyCard extends React.Component {
         let breadcrumbs = [{name:'Home', link:'home'},{name:'My Services', link:'/my-services'},{name:'My Profile', link:'/profile'},{name:pageName, link:null}];
         return(
             <Authorizer permissions="can_administrate">
-                <div className="page __manage-my-cards">
+                <Jumbotron pageName={pageName} location={this.props.location}/>
+                <div className="page-service-instance">
                     <Content>
-                        <ContentTitle icon="cog" title="Manage Your Credit Card"/>
+                        <div className="row m-b-20">
+                            <div className="col-xs-12">
+                                <ContentTitle icon="cog" title="Manage Your Credit Card"/>
+
+                            </div>
+                        </div>
                     </Content>
                 </div>
             </Authorizer>

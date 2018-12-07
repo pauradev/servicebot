@@ -2,7 +2,7 @@ import React from 'react';
 import {Authorizer, isAuthorized} from "../utilities/authorizer.jsx";
 import {Link, browserHistory} from 'react-router';
 import ContentTitle from "../layouts/content-title.jsx";
-import {Fetcher} from "servicebot-base-form";
+import Fetcher from "../utilities/fetcher.jsx";
 import cookie from 'react-cookie';
 import Load from "../utilities/load.jsx";
 import DataTable from "../elements/datatable/datatable.jsx";
@@ -11,6 +11,7 @@ import DateFormat from "../utilities/date-format.jsx";
 import _ from "lodash";
 import { connect } from "react-redux";
 import ModalRefund from "../elements/modals/modal-refund.jsx";
+import getSymbolFromCurrency from 'currency-symbol-map';
 
 const mapStateToProps = (state, ownProps) => {
     return {
@@ -102,8 +103,9 @@ class BillingInvoiceList extends React.Component {
     getRefundDetail(transactions){
         if(transactions.length > 0 && transactions[0].amount_refunded > 0) {
             let refunded = transactions[0].amount_refunded;
+            let prefix = getSymbolFromCurrency(transactions[0].currency);
             return (
-                <li><span className="status-label">Refunded:</span> <span><Price value={refunded} currency={transactions[0].currency}/></span></li>
+                <li><span className="status-label">Refunded:</span> <span><Price value={refunded} prefix={prefix}/></span></li>
             );
         } else {
             return (<span/>);
@@ -114,6 +116,7 @@ class BillingInvoiceList extends React.Component {
         //If there is a transaction for this invoice
         if(transactions.length > 0 && transactions[0].refunds.data.length > 0) {
             let refunds = transactions[0].refunds.data;
+            let prefix = getSymbolFromCurrency(transactions[0].currency);
             return (
                 <div className="xaas-dashboard">
                     <div className="xaas-row waiting">
@@ -123,7 +126,7 @@ class BillingInvoiceList extends React.Component {
                         <div className="xaas-body">
                             {refunds.map((refund, index) =>
                                 <div key={"refund-" + index} className="xaas-body-row">
-                                    <div className="xaas-data xaas-price"><b><Price value={refund.amount} currency={transactions[0].currency}/></b></div>
+                                    <div className="xaas-data xaas-price"><b><Price value={refund.amount} prefix={prefix}/></b></div>
                                     <div className="xaas-data xaas-charge"><span>{refund.reason}</span></div>
                                     <div className="xaas-data xaas-action"><span>{refund.status}</span></div>
                                 </div>
@@ -141,7 +144,7 @@ class BillingInvoiceList extends React.Component {
         let self = this;
         return (
             <Authorizer permissions="can_administrate">
-                <button className="buttons _primary _red" onClick={self.openRefundModal()}>Refund Invoice</button>
+                <button className="btn btn-danger" onClick={self.openRefundModal()}>Refund Invoice</button>
             </Authorizer>
         );
     }
@@ -153,6 +156,7 @@ class BillingInvoiceList extends React.Component {
             return(<Load type="content"/>);
         }else{
             let invoice = this.state.invoice;
+            let prefix = getSymbolFromCurrency(invoice.currency);
             let invoiceOwner = this.state.invoiceOwner;
 
             let currentModal = ()=> {
@@ -164,8 +168,15 @@ class BillingInvoiceList extends React.Component {
             };
 
             return (
-                <React.Fragment>
-                    <ContentTitle title={`Invoice ID:${invoice.invoice_id}`}/>
+                <div className="col-xs-12">
+                    <div className="row">
+                        <div className="col-xs-10">
+                            <ContentTitle icon="cog" title={`Invoice ID:${invoice.invoice_id}`}/>
+                        </div>
+                        <div className="col-xs-2">
+                            {this.getActionButtons()}
+                        </div>
+                    </div>
                     <div className="Invoice">
                         <div className="invoice-header">
                             <div className="invoice-header-header">
@@ -183,33 +194,33 @@ class BillingInvoiceList extends React.Component {
                         </div>
                         <div className="entity-info">
                             <div className="invoice-entity-details">
-                                <div>
+                                <div className="col-xs-12 col-md-4">
                                     <div className="invoice-from-header"><h3>From</h3></div>
                                     <div className="invoice-from-body">
                                         <ul>
                                             <li className="entity-name">{options.company_name && options.company_name.value}</li>
                                             <li>{options.company_address && options.company_address.value}</li>
-                                            {options.company_email && <li>{options.company_email.value}</li>}
-                                            {options.company_phone_number && <li>{options.company_phone_number.value}</li>}
+                                            {options.company_email && <li><i className="fa fa-envelope"/> {options.company_email.value}</li>}
+                                            {options.company_phone_number && <li><i className="fa fa-phone"/> {options.company_phone_number.value}</li>}
                                         </ul>
                                     </div>
                                 </div>
-                                <div>
+                                <div className="col-xs-12 col-md-4">
                                     <div className="invoice-to-header"><h3>To</h3></div>
                                     <div className="invoice-to-body">
                                         <ul>
-                                            {invoiceOwner.name && <li className="entity-name">{invoiceOwner.name}</li> }
-                                            {invoiceOwner.email && <li>{invoiceOwner.email}</li> }
-                                            {invoiceOwner.phone && <li>{invoiceOwner.phone}</li> }
+                                            {invoiceOwner.name && <li className="entity-name"><i className="fa fa-user"/> {invoiceOwner.name}</li> }
+                                            {invoiceOwner.email && <li><i className="fa fa-envelope"/> {invoiceOwner.email}</li> }
+                                            {invoiceOwner.phone && <li><i className="fa fa-phone"/> {invoiceOwner.phone}</li> }
                                         </ul>
                                     </div>
                                 </div>
-                                <div>
+                                <div className="col-xs-12 col-md-4">
                                     <div className="invoice-status-header"><h3>Details</h3></div>
                                     <div className="invoice-status-body">
                                         <ul>
                                             <li><span className="status-label">Invoice Total:</span> {_.has(invoice, 'references.transactions[0].amount') ?
-                                                <Price value={invoice.references.transactions[0].amount} currency={invoice.currency}/> : <Price value={invoice.amount_due} currency={invoice.currency}/>}</li>
+                                                <Price value={invoice.references.transactions[0].amount} prefix={prefix}/> : <Price value={invoice.amount_due} prefix={prefix}/>}</li>
 
                                             {this.getRefundDetail(invoice.references.transactions)}
 
@@ -244,7 +255,7 @@ class BillingInvoiceList extends React.Component {
                                         <td>{line.description}</td>
                                         <td>{line.type}</td>
                                         <td>{line.quantity}</td>
-                                        <td><Price value={line.amount} currency={invoice.currency}/></td>
+                                        <td><Price value={line.amount} prefix={prefix}/></td>
                                     </tr>
                                 )}
                                 </tbody>
@@ -253,7 +264,7 @@ class BillingInvoiceList extends React.Component {
                                         <td/><td/><td/>
                                         <td><strong>Transaction Total</strong></td>
                                         {_.has(invoice, 'references.transactions[0].amount') ?
-                                            <td><strong><Price value={invoice.references.transactions[0].amount} currency={invoice.currency}/></strong></td>:
+                                            <td><strong><Price value={invoice.references.transactions[0].amount} prefix={prefix}/></strong></td>:
                                             <td><strong>No Charge</strong></td>
                                         }
                                     </tr>
@@ -263,13 +274,9 @@ class BillingInvoiceList extends React.Component {
                         <div className="invoice-footer">
 
                         </div>
-
-                        <div className={`invoice-actions`}>
-                            {this.getActionButtons()}
-                        </div>
                     </div>
                     {currentModal()}
-                </React.Fragment>
+                </div>
             );
         }
     }

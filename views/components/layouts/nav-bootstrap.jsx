@@ -9,8 +9,10 @@ import SideNav from '../layouts//side-nav.jsx';
 import {AppMessage} from '../elements/app-message.jsx';
 import ReactTooltip from 'react-tooltip';
 import consume from "pluginbot-react/dist/consume"
+
 import { connect } from "react-redux";
 import '../../../public/js/bootstrap-3.3.7-dist/js/bootstrap.js';
+import $ from "jquery";
 let _ = require("lodash");
 
 const AnonymousLinks = ({signUpEnabled}) => (
@@ -54,9 +56,20 @@ class NavBootstrap extends React.Component {
         this.toggleOffEditingGear = this.toggleOffEditingGear.bind(this);
         this.getLivemode = this.getLivemode.bind(this);
         this.getPluginItems = this.getPluginItems.bind(this);
-        this.getSettingsMenus = this.getSettingsMenus.bind(this);
 
 
+    }
+
+    componentDidMount(){
+        $(this.refs.dropdownToggle).dropdown();
+        $(this.refs.dropdownToggle2).dropdown();
+        $(this.refs.dropdownToggle3).dropdown();
+    }
+
+    componentDidUpdate(){
+        $(this.refs.dropdownToggle).dropdown();
+        $(this.refs.dropdownToggle2).dropdown();
+        $(this.refs.dropdownToggle3).dropdown();
     }
 
     onOpenInvoiceModal(){
@@ -94,22 +107,11 @@ class NavBootstrap extends React.Component {
     getPluginItems(){
         let user = this.props.user;
         return this.props.services.routeDefinition && this.props.services.routeDefinition.reduce((acc, route, index) => {
-            if(route.isVisible(user) && route.navType === "main") {
+            if(route.isVisible(user)) {
                 acc.push(<li><Link key={index} to={route.path}>{route.name}</Link></li>)
             }
             return acc;
         }, [])
-
-    }
-    getSettingsMenus(){
-        let user = this.props.user;
-        return this.props.services.routeDefinition && this.props.services.routeDefinition.reduce((acc, route, index) => {
-            if(route.isVisible(user) && route.navType === "settings") {
-                acc.push(<li><Link key={index} to={route.path}>{route.name}</Link></li>)
-            }
-            return acc;
-        }, [])
-
 
     }
 
@@ -137,7 +139,6 @@ class NavBootstrap extends React.Component {
                             <li><Link to="/notification-templates">Email Settings</Link></li>
                             <li><Link to="/manage-permission">Permission Settings</Link></li>
                             <li><Link to="/system-settings">System Settings</Link></li>
-                            {this.getSettingsMenus()}
                         </ul>
                     </li>
                     {this.getPluginItems()}
@@ -173,7 +174,7 @@ class NavBootstrap extends React.Component {
             return (
                 <span data-tip data-for="notification-stripe-keys" className="notification-badge">
                     <Link to="/stripe-settings">
-                        <ReactTooltip id="notification-stripe-keys" className="notification-stripe-keys"
+                        <ReactTooltip id="notification-stripe-keys" class="notification-stripe-keys"
                                       aria-haspopup='true' role='example'
                                       place="bottom" type="error" effect="solid" offset={{top: -28, left: -20}}>
                             <p><strong>You need to complete your setup to unlock certain features:</strong></p>
@@ -267,7 +268,7 @@ class NavBootstrap extends React.Component {
                                             </div>
                                         </li>
                                         <li>
-                                            <button className="buttons btn-link btn-signout"
+                                            <button className="btn btn-link btn-signout"
                                                     onClick={this.props.handleLogout} style={linkTextStyle}>Log Out</button>
                                         </li>
                                     </ul>

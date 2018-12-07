@@ -1,7 +1,7 @@
 import React from 'react';
 import cookie from 'react-cookie';
 import Load from '../../utilities/load.jsx';
-import {Fetcher} from "servicebot-base-form"
+import Fetcher from "../../utilities/fetcher.jsx"
 import {browserHistory} from 'react-router';
 import Modal from '../../utilities/modal.jsx';
 import ModalPaymentSetup from './modal-payment-setup.jsx';
@@ -66,8 +66,8 @@ class ModalDeleteRequest extends React.Component {
                             </div>
                         </div>
                         <div className={`modal-footer text-right p-b-20`}>
-                            <button className="buttons btn-primary btn-rounded" onClick={self.onDelete}>Delete Request</button>
-                            <button className="buttons btn-default btn-rounded" onClick={self.props.hide}>Nevermind</button>
+                            <button className="btn btn-primary btn-rounded" onClick={self.onDelete}>Delete Request</button>
+                            <button className="btn btn-default btn-rounded" onClick={self.props.hide}>Nevermind</button>
                         </div>
                     </div>
                 </Modal>

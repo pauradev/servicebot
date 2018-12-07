@@ -39,7 +39,6 @@ module.exports = {
         app.use(function(req, res, next) {
             res.header("Access-Control-Allow-Credentials", true);
             res.header("Access-Control-Allow-Origin", "*");
-            res.header("Access-Control-Allow-Methods", "*");
             res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
             next();
         });
@@ -159,7 +158,6 @@ module.exports = {
         require('../../api/notifications')(api);
         require('../../api/permissions')(api);
         require('../../api/roles')(api);
-        require('../../api/tiers')(api);
         require('../../api/webhooks')(api);
         let routeConsumer = require("./router");
         let authService = yield consume(services.authService);
@@ -184,7 +182,7 @@ module.exports = {
             let configBuilder = require("pluginbot/config");
             let clientPlugins = Object.keys((await configBuilder.buildClientConfig(CONFIG_PATH)).plugins);
             let {site_title, site_description, hostname} = store.getState().options;
-            res.render("main", {vendor: appConfig.vendor_path, bundle : appConfig.bundle_path, plugins : clientPlugins, site_title, site_description, hostname});
+            res.render("main", {bundle : appConfig.bundle_path, plugins : clientPlugins, site_title, site_description, hostname});
         })
 
 

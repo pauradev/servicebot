@@ -1,18 +1,16 @@
 import React from 'react';
-import {Fetcher} from "servicebot-base-form"
+import Fetcher from "../utilities/fetcher.jsx"
+import DataTable from "../elements/datatable/datatable.jsx";
+import Jumbotron from "../layouts/jumbotron.jsx";
 import {Link, browserHistory} from 'react-router';
 import Content from "../layouts/content.jsx";
+import ContentTitle from "../layouts/content-title.jsx";
 import DateFormat from "../utilities/date-format.jsx";
 import {connect} from "react-redux";
 import {setNotifications, setNotification,setSystemNotifications, addNotification} from "../utilities/actions";
 import {isAuthorized} from "../utilities/authorizer.jsx"
 import ModalNotification from "../elements/modals/modal-notification.jsx";
-import SVGIcons from '../utilities/svg-icons.jsx';
 let _ = require("lodash");
-import {TableHeaderColumn} from 'react-bootstrap-table';
-import {ServiceBotTableBase} from '../elements/bootstrap-tables/servicebot-table-base.jsx';
-import '../../../node_modules/react-bootstrap-table/dist/react-bootstrap-table-all.min.css';
-
 
 class Notification extends React.Component{
 
@@ -104,10 +102,7 @@ class NavNotification extends React.Component{
 
     miniList(unread){
 
-        let self = this;
-        let {openNotificationDropdown} = this.state;
-
-        if(openNotificationDropdown === true) {
+        if(this.state.openNotificationDropdown === true) {
 
             let totalUnread = unread.length;
             if(unread.length && unread.length > 3){
@@ -115,29 +110,17 @@ class NavNotification extends React.Component{
             }
 
             return (
-                <div>
-                    <div className="_backdrop" onClick={()=>{self.setState({openNotificationDropdown: false})}}/>
-                    <div className="app-notification-list">
-                        <h3 className="__header">
-                            <SVGIcons width="24" height="24" viewBoxX="0" viewBoxY="0" viewWidth="24" viewHeight="24">
-                                <path fill="none" d="M0 0h24v24H0V0z"/><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-1.29 1.29c-.63.63-.19 1.71.7 1.71h13.17c.89 0 1.34-1.08.71-1.71L18 16z"/>
-                            </SVGIcons>
-                            Notifications
-                        </h3>
-                        { totalUnread ? <h4 className="__unread-heading">{`You have ${totalUnread} unread notifications`}</h4> : <React.Fragment/>}
-                        { !totalUnread ? <h4 className="__empty-heading">You have no new notifications</h4> : <React.Fragment/> }
-                        <ul className={`__unread-list`}>
-                            {unread.length ? unread.map(message => (
-                                <li className="__unread-item" key={`message-${message.id}`} onClick={()=>{return this.openMessageModel(message)}}
+                <div className="mini-notification-list">
+                    {totalUnread ? <li className="text-center"><strong>{`You have ${totalUnread} unread notifications`}</strong></li> : <span/>}
+                    <ul>
+                        {unread.length ? unread.map(message => (
+                                <li className="unread-message" key={`message-${message.id}`} onClick={()=>{return this.openMessageModel(message)}}
                                     dangerouslySetInnerHTML={this.createMarkup((message.message))}>
                                 </li>
-                                )) : <React.Fragment/>
-                            }
-                            <li className={`_view-all`}>
-                                <button className={`buttons _text`} onClick={this.viewAll}>View All</button>
-                            </li>
-                        </ul>
-                    </div>
+                            )) :  <li className="text-center">You have no new notifications</li>
+                        }
+                        <li className="text-center" onClick={this.viewAll}>View All</li>
+                    </ul>
                 </div>
             );
         }else{
@@ -149,22 +132,37 @@ class NavNotification extends React.Component{
         let unread = this.props.notifications.filter(notification => !notification.read);
 
         return (
-            <div className="app-notification">
-                <span className="_toggle" onClick={this.openNotificationDropdown}>
-                    <SVGIcons width="24" height="24" viewBoxX="0" viewBoxY="0" viewWidth="24" viewHeight="24">
-                        <path fill="none" d="M0 0h24v24H0V0z"/><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-1.29 1.29c-.63.63-.19 1.71.7 1.71h13.17c.89 0 1.34-1.08.71-1.71L18 16z"/>
-                    </SVGIcons>
-                    {unread.length ? <span className="nav-notification-indicator"/> : <span/>}
-                    {/*<span className="notification-badge">{unread.length ? unread.length : '0'}</span>*/}
-                </span>
-                {this.miniList(unread)}
-                {this.state.openNotificationDropdown && <div className="app-notification-backdrop" onClick={this.closeNotificationDropdown}/>}
-                {this.state.viewMessage !== null && <ModalNotification key="notification-modal" hide={this.closeMessageModel} notification={this.state.viewMessage}/>}
-            </div>
+            <li className="nav-notification">
+                <div>
+                    <span onClick={this.openNotificationDropdown}>
+                        <i className="fa fa-bell nav-notification-icon" aria-hidden="true"/>
+                        {unread.length ? <span className="nav-notification-indicator"/> : <span/>}
+                        {/*<span className="notification-badge">{unread.length ? unread.length : '0'}</span>*/}
+                    </span>
+                    {this.miniList(unread)}
+                </div>
+                {this.state.openNotificationDropdown && <div className="mini-notification-backdrop" onClick={this.closeNotificationDropdown}/>}
+                {this.state.viewMessage != null && <ModalNotification key="notification-modal" hide={this.closeMessageModel} notification={this.state.viewMessage}/>}
+            </li>
         )
     }
 }
-
+// class SystemNotificationList extends React.Component{
+//     constructor(props){
+//         super(props);
+//     }
+//     render(){
+//         console.log("RENDING SYSTEMS")
+//         let notifications = this.props.system_notifications.map(notification => {
+//             return (<li key={notification.id}><Notification {...notification} /></li>)
+//         })
+//
+//         return (<ul>
+//             {notifications}
+//         </ul>)
+//     }
+//
+// }
 class NotificationList extends React.Component{
 
     constructor(props){
@@ -206,12 +204,12 @@ class NotificationList extends React.Component{
     modMessage(data, dataObj){
         if(data.length <= 90){
             return (
-                <span className="buttons _default _text __message-link" onClick={()=>{return (this.openMessageModel(dataObj))}}>{data || 'Empty message body.'}</span>
+                <span className="btn-link" onClick={()=>{return (this.openMessageModel(dataObj))}}>{data}</span>
             );
         }else {
             let trimmedHTML = this.createMarkup(this.trimText(data, 90).props.children);
             return (
-                <span className="buttons _default _text __message-link-trimmed" onClick={()=>{return (this.openMessageModel(dataObj))}} dangerouslySetInnerHTML={trimmedHTML}/>
+                <span className="trimmed-text btn-link" onClick={()=>{return (this.openMessageModel(dataObj))}} dangerouslySetInnerHTML={trimmedHTML}/>
             );
         }
     }
@@ -255,28 +253,24 @@ class NotificationList extends React.Component{
 
         let notificationType = this.props.notificationType;
         let notifications = notificationType == '_SYSTEM' ? this.props.system_notifications : this.props.notifications;
-        let notificationsNullMessage = notificationType == '_SYSTEM' ? "There are no system notifications at this time" : "There are no notifications at this time";
+        let notificationsNullMessage = notificationType == '_SYSTEM' ? "No system notifications at this time" : "No notifications at this time";
 
-        if(notifications.length){
-            return (
-                <React.Fragment>
-                    <ServiceBotTableBase
-                        rows={notifications}
-                        sortColumn="created_at"
-                        sortOrder="desc">
-                        <TableHeaderColumn isKey dataField='subject' dataSort={ true } dataFormat={this.modSubject} width={`200px`}>Subject</TableHeaderColumn>
-                        <TableHeaderColumn dataField='message' dataSort={ true } dataFormat={this.modMessage} width={`200px`}>Message</TableHeaderColumn>
-                        <TableHeaderColumn dataField='created_at' dataSort={ true } dataFormat={this.modCreatedAt} width={`200px`}>Notification Time</TableHeaderColumn>
-                    </ServiceBotTableBase>
-                    {this.state.viewMessage != null && <ModalNotification key="notification-modal" hide={this.closeMessageModel} notification={this.state.viewMessage}/>}
-                </React.Fragment>
-            )
-        }else{
-            return (
-                <p>{notificationsNullMessage}</p>
-            )
-        }
 
+        return (
+            <div>
+                <DataTable
+                    dataObj={notifications}
+                    col={['subject', 'message', 'created_at']}
+                    colNames={['Subject', 'Message', 'Created At']}
+                    mod_message={this.modMessage}
+                    mod_created_at={this.modCreatedAt}
+                    rowClasses={this.rowClasses}
+                    nullMessage={notificationsNullMessage}
+                    lastFetch={this.state.lastFetch}
+                />
+                {this.state.viewMessage != null && <ModalNotification key="notification-modal" hide={this.closeMessageModel} notification={this.state.viewMessage}/>}
+            </div>
+        )
     }
 }
 class Notifications extends React.Component{
@@ -310,20 +304,21 @@ class Notifications extends React.Component{
     render(){
         return (
             <div>
-                <div className="app-content __manage-notifications">
+                <Jumbotron pageName={this.props.route.name} location={this.props.location}/>
+                <div className="page-service-instance">
                     <Content>
-                        <div className={`_title-container`}>
-                            <h1 className={`_heading`}>Notification Center</h1>
-                        </div>
-                        {isAuthorized({permissions: "put_notification_templates_id"}) &&
-                            <div className={`_section`}>
-                                <h3>System Notifications</h3>
-                                <NotificationList notificationType="_SYSTEM"/>
+                        <div className="row m-b-20">
+                            <div className="col-xs-12">
+                                <ContentTitle icon="user" title="Notifications"/>
+                                {isAuthorized({permissions: "put_notification_templates_id"}) &&
+                                    <div>
+                                        <p><strong>System Notifications</strong></p>
+                                        <NotificationList notificationType="_SYSTEM"/>
+                                    </div>
+                                }
+                                <p><strong>User Notifications</strong></p>
+                                <NotificationList/>
                             </div>
-                        }
-                        <div className={`_section`}>
-                            <h3>User Notifications</h3>
-                            <NotificationList/>
                         </div>
                     </Content>
                 </div>

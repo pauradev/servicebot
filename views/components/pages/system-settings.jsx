@@ -3,7 +3,6 @@ import {Link, hashHistory, browserHistory} from 'react-router';
 import {Authorizer, isAuthorized} from "../utilities/authorizer.jsx";
 import Jumbotron from "../layouts/jumbotron.jsx";
 import Content from "../layouts/content.jsx";
-import ContentTitle from "../layouts/content-title.jsx";
 import SystemSettingsForm from "../elements/forms/system-settings-form.jsx";
 
 class SystemSettings extends React.Component {
@@ -20,14 +19,16 @@ class SystemSettings extends React.Component {
     }
 
     render () {
+        let pageName = this.props.route.name;
+        let subtitle = 'Change system settings, theme, and content'
         return(
             <Authorizer permissions="can_administrate">
-                <div className="app-content __manage-system-settings">
+                <Jumbotron pageName={pageName} subtitle={subtitle}/>
+                <div className="page-service-instance">
                     <Content>
-                        <div className={`_title-container`}>
-                            <h1 className={`_heading`}>Manage System Settings</h1>
+                        <div className="row m-b-20">
+                            <SystemSettingsForm/>
                         </div>
-                        <SystemSettingsForm/>
                     </Content>
                 </div>
             </Authorizer>

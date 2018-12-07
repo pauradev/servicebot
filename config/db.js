@@ -6,10 +6,6 @@ var config = {
     port: process.env.POSTGRES_DB_PORT
 };
 
-//this is for parsing bigints
-var pg = require('pg')
-pg.types.setTypeParser(20, 'text', parseInt)
-
 var knex = require('knex')({
     client: 'pg',
     connection: config,
