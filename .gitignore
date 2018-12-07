@@ -9,3 +9,6 @@ env
 package-lock.json
 .flooignore
 .floo
+asymmetric-ray-192518-b18f801df438.json
+docker-compose.yaml
+

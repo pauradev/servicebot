@@ -126,7 +126,6 @@ class CustomField extends React.Component {
 
         if (myValues.prop_label) {
             willAutoFocus = false;
-
         }
         return (
             <div className="custom-property-fields">
@@ -185,6 +184,12 @@ class CustomField extends React.Component {
                     }
                 </div>
                 <div id="custom-prop-widget" className="custom-property-field-group">
+                    {machineName &&
+                    <div className="form-group form-group-flex addon-options-widget-config-input-wrapper">
+                        <label className="control-label form-label-flex-md addon-options-widget-config-input-label">Machine
+                            Name</label>
+                        <pre>{machineName}</pre>
+                    </div>}
                     {typeValue && <RenderWidget
                         showPrice={(templateType !== "custom" && templateType !== "split")}
                         member={member}
@@ -370,8 +375,9 @@ class TemplateForm extends React.Component {
                     <div className="col-md-8">
                         <div className="form-level-errors">
                             {!options.stripe_publishable_key &&
-                            <Link to="/stripe-settings"><br/><h4 className="form-error">Publishing Disabled Until Setup
-                                Complete - Click here to complete</h4></Link>}
+                            <Link to="/stripe-settings"><br/><h4 className="form-error" style={{padding:'10px',paddingLeft:'30px'}}>
+                                The Request Of This Service Disabled Until Setup Complete - Click here to complete</h4>
+                            </Link>}
                             {error && <div className="form-error">{error}</div>}
                         </div>
                         <div className="form-level-warnings"/>
@@ -385,15 +391,16 @@ class TemplateForm extends React.Component {
                                validate={[required()]}
                         />
                         <div className="sb-form-groupform-group-flex">
+
                             <Field name="details" type="text"
                                    component={WysiwygRedux} label="Details"
                             />
                         </div>
 
-                        {options.stripe_publishable_key && <Field name="published" type="checkbox"
-                                                                  defaultValue={true} color="#0091EA" faIcon="check"
-                                                                  component={OnOffToggleField} label="Published?"
-                        />}
+                        <Field name="published" type="checkbox"
+                               defaultValue={true} color="#0091EA" faIcon="check"
+                               component={OnOffToggleField} label="Published?"
+                        />
                         <Field name="category_id" type="select"
                                component={selectField} label="Category" options={formJSON ? formJSON._categories : []}
                                validate={[required()]}
