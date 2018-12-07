@@ -1,0 +1,11 @@
+
+Build Docker container
+
+sudo docker build -t servicebot .
+
+
+Start/Stop Docker
+
+sudo docker-compose down
+
+sudo docker-compose up
