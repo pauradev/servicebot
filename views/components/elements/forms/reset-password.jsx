@@ -1,7 +1,7 @@
 import React from 'react';
 import Alert from 'react-s-alert';
 import {Link, browserHistory} from 'react-router';
-import Fetcher from "../../utilities/fetcher.jsx";
+import {Fetcher} from "servicebot-base-form";
 import update from "immutability-helper";
 import {Authorizer, isAuthorized} from "../../utilities/authorizer.jsx";
 import {connect} from "react-redux";
@@ -74,12 +74,12 @@ class ResetPassword extends React.Component {
                     <p>
                         Enter your new password to reset.
                     </p>
-                    <div className="form-group">
+                    <div className="sb-form-group">
                         <label htmlFor="sign-in-2-email" className="bmd-label-floating">New Password</label>
-                        <input onChange={this.handleInputChange} id="password" type="password" name="password" className="form-control"/>
+                        <input onChange={this.handleInputChange} id="password" type="password" name="password" className="_input-"/>
                         <span className="bmd-help">Please enter your new password</span>
                     </div>
-                    <button onClick={this.handleReset} type='submit' className="btn btn-raised btn-lg btn-primary btn-block">Reset Password</button>
+                    <button onClick={this.handleReset} type='submit' className="buttons btn-raised btn-lg btn-primary btn-block">Reset Password</button>
                 </form>
             </Authorizer>
         );

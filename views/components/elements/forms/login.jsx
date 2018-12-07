@@ -1,7 +1,7 @@
 import React from 'react';
 import {Link, browserHistory} from 'react-router';
 import Content from '../../layouts/content.jsx';
-import Fetcher from "../../utilities/fetcher.jsx";
+import {Fetcher} from "servicebot-base-form";
 import Load from "../../utilities/load.jsx";
 import update from "immutability-helper";
 import {Authorizer, isAuthorized} from "../../utilities/authorizer.jsx";
@@ -10,6 +10,7 @@ import Buttons from '../buttons.jsx';
 import {connect} from "react-redux";
 import {setUid, setUser, fetchUsers, setVersion, addAlert, dismissAlert, setPermissions} from "../../utilities/actions";
 import cookie from 'react-cookie';
+import ContentTitle from "../../layouts/content-title.jsx";
 let _ = require("lodash");
 
 class Login extends React.Component {
@@ -51,7 +52,7 @@ class Login extends React.Component {
                     if (self.props.location.state && self.props.location.state.fromSignup) {
                         return browserHistory.go(-2);
                     } else if(result.permissions.includes("can_administrate", "can_manage")){
-                        return browserHistory.push("/dashboard");
+                        return browserHistory.push("/");
                     } else {
                         return browserHistory.push("/my-services");
                     }
@@ -69,7 +70,7 @@ class Login extends React.Component {
                 }
 
             }else{
-                let loginErrorAlert = {id: '112', message: 'Your user name or password is not correct.', show: true};
+                let loginErrorAlert = {id: '112', message: 'Your user name or password is not correct.', show: true, autoDismiss: 5000};
                 self.props.addAlert(loginErrorAlert);
                 self.setState({errors: result.error, alerts: [ ...self.state.alerts, loginErrorAlert ]});
             }
@@ -116,80 +117,76 @@ class Login extends React.Component {
         }else{
             if (this.props.modal && this.props.email) {
                 return (
-                    <Content primary={true}>
-                        <div className="centered-box col-md-6 col-md-offset-3 col-sm-10 col-sm-offset-1 col-xs-12">
-                            <form className="sign-in">
-                                {/*<img className="login-brand" src="/assets/logos/brand-logo-dark.png"/>*/}
-                                {this.state.invitationExists &&
-                                <div>
-                                    <h3 className="text-center">Account confirmation email is sent to {this.props.email}?</h3>
-                                    <p>Please check your email to complete your account before continue.</p>
-                                    <Buttons buttonClass="btn btn-link" size="md" position="center" btnType="link"
-                                             value="submit"
-                                             onClick={this.goToLogin}>
-                                        <span>I already confirmed my account, continue.</span>
-                                    </Buttons>
-                                </div>
-                                }
+                    <div className={`page __app-login`}>
+                        <Content>
+                            <div className="login-container">
+                                <form className="login-form">
+                                    {this.state.invitationExists &&
+                                    <React.Fragment>
+                                        <h3 className="text-center">Account confirmation email is sent to {this.props.email}?</h3>
+                                        <p>Please check your email to complete your account before continue.</p>
+                                        <Buttons buttonClass="buttons btn-link" size="md" position="center" btnType="link"
+                                                 value="submit"
+                                                 onClick={this.goToLogin}>
+                                            <span>I already confirmed my account, continue.</span>
+                                        </Buttons>
+                                    </React.Fragment>
+                                    }
 
-                                {!this.state.invitationExists &&
-                                <div>
-                                    <h3>Login as: {this.props.email}</h3>
-                                    <p>Please login to continue</p>
-                                    <div className={`form-group ${this.state.errors && 'has-error   '}`}>
-                                        <input onChange={this.handleInputChange} id="password" type="password"
-                                               name="password" className="form-control" placeholder="Password"/>
-                                        {this.state.errors && <span className="help-block">{this.state.errors}</span>}
-                                    </div>
-                                    <button onClick={this.handleLogin} type='submit'
-                                            className="btn btn-raised btn-lg btn-primary btn-block">Sign in
-                                    </button>
-                                    <p className="sign-up-link"><Link
-                                        to={{pathname: "/forgot-password", state: {fromLogin: false}}}> Forgot
-                                        Password</Link></p>
-                                </div>
-                                }
-                            </form>
-                        </div>
-                    </Content>
-                )
-            } else {
-                return (
-                    <Authorizer anonymous={true}>
-                        <Content primary={true}>
-                            {/*<div className="left-panel col-md-6">adsf</div>*/}
-                            <div className="centered-box col-md-6 col-md-offset-3 col-sm-10 col-sm-offset-1 col-xs-12">
-                                <form className="sign-in">
-                                    {/*<Alert stack={{limit: 3}} position='bottom'/>*/}
-                                    {/*<img className="login-brand" src="/assets/logos/brand-logo-dark.png"/>*/}
-                                    <h3>Login</h3>
-
-                                    <div className="form-group">
-                                        <input onChange={this.handleInputChange} id="email" type="text" name="email"
-                                               defaultValue={this.props.email || ''} className="form-control" placeholder="Email Address"/>
-                                    </div>
-                                    <div className="form-group">
-                                        <input onChange={this.handleInputChange} id="password" type="password"
-                                               name="password" className="form-control" placeholder="Password"/>
-                                    </div>
-                                    <button onClick={this.handleLogin} type='submit'
-                                            className="btn btn-raised btn-lg btn-primary btn-block">Sign in
-                                    </button>
-                                    <p className="sign-up-link">
-                                        <Link to={{pathname: "/forgot-password", state: {fromLogin: false}}}> Forgot
-                                            Password</Link>
-                                    </p>
-                                    {(this.props.options && this.props.options.allow_registration.value == 'true') &&
-                                    <p className="sign-up-link">Don't have an account?
-                                        <span><Link to={{
-                                            pathname: "/signup",
-                                            state: {fromLogin: true}
-                                        }}> Sign up here</Link></span>
-                                    </p>
+                                    {!this.state.invitationExists &&
+                                    <React.Fragment>
+                                        <h3>Login as: {this.props.email}</h3>
+                                        <p>Please login to continue</p>
+                                        <div className={`sb-form-group${this.state.errors && 'has-error   '}`}>
+                                            <input onChange={this.handleInputChange} id="password" type="password"
+                                                   name="password" className="_input-" placeholder="Password"/>
+                                            {this.state.errors && <span className="help-block">{this.state.errors}</span>}
+                                        </div>
+                                        <div className={`sb-form-group buttons-group __gap`}>
+                                            <button onClick={this.handleLogin} type='submit' className="buttons _default _right">
+                                                Sign in</button>
+                                            <Link className={`buttons _default _text`} to={{pathname: "/forgot-password", state: {fromLogin: false}}}>
+                                                Forgot Password</Link>
+                                        </div>
+                                    </React.Fragment>
                                     }
                                 </form>
                             </div>
                         </Content>
+                    </div>
+                )
+            } else {
+                return (
+                    <Authorizer anonymous={true}>
+                        <div className={`page __app-login`}>
+                            <Content>
+                                <div className="login-container">
+                                    <form className="login-form">
+                                        <div className="sb-form-group">
+                                            <ContentTitle title={`Login`}/>
+                                            <input onChange={this.handleInputChange} id="email" type="text" name="email"
+                                                   defaultValue={this.props.email || ''} className="_input- _input-default" placeholder="Email Address"/>
+                                        </div>
+                                        <div className="sb-form-group">
+                                            <input onChange={this.handleInputChange} id="password" type="password"
+                                                   name="password" className="_input- _input-default" placeholder="Password"/>
+                                        </div>
+                                        <div className={`sb-form-group buttons-group __gap`}>
+                                            <button className={`buttons _default`} onClick={this.handleLogin} type='submit'>Sign in</button>
+                                            <Link className={`buttons _default _text`} to={{pathname: "/forgot-password", state: {fromLogin: false}}}>Forgot Password</Link>
+                                        </div>
+                                        {(this.props.options && this.props.options.allow_registration.value === 'true') &&
+                                        <p className="sign-up-link">Don't have an account?
+                                            <span><Link to={{
+                                                pathname: "/signup",
+                                                state: {fromLogin: true}
+                                            }}> Sign up here</Link></span>
+                                        </p>
+                                        }
+                                    </form>
+                                </div>
+                            </Content>
+                        </div>
                     </Authorizer>
                 );
             }

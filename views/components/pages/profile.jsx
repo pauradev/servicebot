@@ -6,7 +6,7 @@ import Jumbotron from "../layouts/jumbotron.jsx";
 import Content from "../layouts/content.jsx";
 import ContentTitle from "../layouts/content-title.jsx";
 import UserFormEdit from "../elements/forms/user-form-edit.jsx";
-import Fetcher from "../utilities/fetcher.jsx";
+import {Fetcher} from "servicebot-base-form";
 import { connect } from "react-redux";
 
 const mapStateToProps = (state, ownProps) => {
@@ -65,34 +65,20 @@ class Profile extends React.Component {
 
         if(this.state.loading){
             return(
-                <div>
-                    <Jumbotron pageName={pageName} location={this.props.location}/>
-                    <div className="page-service-instance">
-                        <Content>
-                            <div className="row m-b-20">
-                                <div className="col-xs-12">
-                                    <ContentTitle icon="user" title="My Profile"/>
-                                    <Load/>
-                                </div>
-                            </div>
-                        </Content>
-                    </div>
+                <div className="page __view-my-profile">
+                    <Content>
+                        <ContentTitle icon="user" title="My Profile"/>
+                        <Load/>
+                    </Content>
                 </div>
             );
         }else {
             return (
-                <div>
-                    <Jumbotron pageName={pageName} location={this.props.location}/>
-                    <div className="page-service-instance">
-                        <Content>
-                            <div className="row m-b-20">
-                                <div className="col-xs-12">
-                                    <ContentTitle icon="user" title="My Profile"/>
-                                    {this.getUserEditForm()}
-                                </div>
-                            </div>
-                        </Content>
-                    </div>
+                <div className="page __view-my-profile">
+                    <Content>
+                        <ContentTitle icon="user" title="My Profile"/>
+                        {this.getUserEditForm()}
+                    </Content>
                 </div>
             );
         }

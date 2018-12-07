@@ -17,16 +17,8 @@ import {
 import {connect} from "react-redux";
 import {RenderWidget, WidgetList, PriceBreakdown, widgets} from "../../utilities/widgets";
 import {WysiwygRedux} from "../../elements/wysiwyg.jsx";
-import {
-    inputField,
-    selectField,
-    OnOffToggleField,
-    iconToggleField,
-    priceField,
-    priceToCents
-} from "./servicebot-base-field.jsx";
 import {addAlert, dismissAlert} from "../../utilities/actions";
-import ServiceBotBaseForm from "./servicebot-base-form.jsx";
+import {ServicebotBaseForm, inputField, selectField, priceField} from "servicebot-base-form";
 import Load from "../../utilities/load.jsx";
 
 let _ = require("lodash");
@@ -58,10 +50,10 @@ function renderSplits({fields, meta: {error, submitFailed}}) {
 
     return (
         <div>
-            <div className="form-group form-group-flex">
+            <div className="sb-form-groupform-group-flex">
                 <lable className="control-label form-label-flex-md">Number of payments</lable>
                 <div className="form-input-flex">
-                    <input className="form-control" type="number" defaultValue={fields.length} onChange={onAdd}/>
+                    <input className="_input-" type="number" defaultValue={fields.length} onChange={onAdd}/>
                     {submitFailed && error && <span>{error}</span>}
                 </div>
             </div>
@@ -69,7 +61,7 @@ function renderSplits({fields, meta: {error, submitFailed}}) {
             <ul className="split-payment-items">
                 {fields.map((member, index) => (
                     <li className="split-payment-item" key={index}>
-                        <button className="btn btn-rounded custom-field-button iconToggleField"
+                        <button className="buttons btn-rounded custom-field-button iconToggleField"
                                 id="split-payment-delete-button" onClick={() => fields.remove(index)}
                                 type="button" title="Remove Payment"><span className="itf-icon"><i
                             className="fa fa-close"/></span></button>
@@ -191,7 +183,7 @@ class TemplateForm extends React.Component {
                                            component={inputField} label="Trial Period (Days)"
                                            validate={required()}
                                     />
-                                    <div className="form-group form-group-flex">
+                                    <div className="sb-form-groupform-group-flex">
                                         <label className="control-label form-label-flex-md" htmlFor="type">Bill
                                             Customer Every</label>
                                         <Field name="interval_count" type="number"
@@ -239,7 +231,7 @@ class TemplateForm extends React.Component {
                     </div>
                 </div>
                 <div id="service-submission-box" className="button-box right">
-                    <button className="btn btn-rounded btn-primary btn-block" type="submit">
+                    <button className="buttons _primary" type="submit">
                         Next
                     </button>
                 </div>
@@ -290,7 +282,7 @@ class ServiceTemplateForm extends React.Component {
             autoDismiss: 4000,
         };
         this.props.addAlert(successMessage);
-        if(this.props.postResponse){
+        if (this.props.postResponse) {
             this.props.postResponse();
         }
         browserHistory.push(`/dashboard`);
@@ -299,8 +291,7 @@ class ServiceTemplateForm extends React.Component {
     submissionPrep(values) {
         //remove id's for duplicate template operation
         if (this.props.params.duplicate) {
-            console.log("We have a duplicate and we want to remove id");
-            delete values.id;
+                        delete values.id;
             values.references.service_template_properties = values.references.service_template_properties.map(prop => {
                 if (prop.id) {
                     delete prop.id;
@@ -370,7 +361,7 @@ class ServiceTemplateForm extends React.Component {
 
             return (
                 <div>
-                    <ServiceBotBaseForm
+                    <ServicebotBaseForm
                         form={TemplateForm}
                         formName={TEMPLATE_FORM_NAME}
                         initialValues={initialValues}

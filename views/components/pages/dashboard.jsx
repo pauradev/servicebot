@@ -84,8 +84,7 @@ class Dashboard extends React.Component {
 
         if (this.state.loading) {
             return (
-                <div className="page-service-instance">
-                    <Jumbotron pageName={pageName} location={this.props.location}/>
+                <div className="page __dashboard">
                     <Content>
                         <div className="row">
                             <Load/>
@@ -96,39 +95,12 @@ class Dashboard extends React.Component {
         } else {
             return (
                 <Authorizer permissions={["can_administrate", "can_manage"]}>
-                    <Jumbotron pageName={pageName} subtitle={sub}/>
-                    <div className="page-service-instance">
+                    <div className="page __dashboard">
                         <Content>
-                            {showSteps ?
-                                    <div>
-                                        <div>
-                                            <div className="col-xs-12 col-sm-12 col-md-8 col-lg-6 col-xl-6 col-md-offset-2 col-lg-offset-3 col-xl-offset-3">
-                                                <ul className="progressbar">
-                                                    <li className={step1}>Create an Offering</li>
-                                                    <li className={step2}>Connect to Stripe</li>
-                                                    <li>Done!</li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                        <div className="dash-tour col-xs-12 col-sm-12 col-md-8 col-lg-6 col-xl-6 col-md-offset-2 col-lg-offset-3 col-xl-offset-3">
-                                            {analytics.offeringStats.total === 0 &&
-                                            <ServiceTemplateFormLite params={{'templateId': null}} postResponse={this.updateOfferingStat}/>
-                                            }
-                                            {analytics.offeringStats.total > 0 &&
-                                            <StripeSettingsForm postResponse={this.updateStripeStat} initialize={true}/>
-                                            }
-                                        </div>
-                                    </div>
-                                :
-
-                                <div>
-                                    <ContentTitle title="Welcome to your dashboard"/>
-                                    <DashboardWidgets data={this.state.analytics}/>
-                                    <OfferingsStatsWidgets data={this.state.analytics} />
-                                    <OverallStatsWidgets data={this.state.analytics} />
-                                </div>
-
-                            }
+                            <ContentTitle title="Dashboard"/>
+                            <DashboardWidgets data={this.state.analytics}/>
+                            <ContentTitle title="Churn Detail"/>
+                            <OverallStatsWidgets data={this.state.analytics} />
                         </Content>
                     </div>
                 </Authorizer>

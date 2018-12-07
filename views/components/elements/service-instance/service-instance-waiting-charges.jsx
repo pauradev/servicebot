@@ -27,9 +27,9 @@ class ServiceInstanceWaitingCharges extends React.Component {
 
     render () {
         let self = this;
-        let title = "Outstanding charges to be paid";
-        let { options } = this.props;
-        let prefix = options.currency ? getSymbolFromCurrency(options.currency.value) : '';
+
+        let title = "Outstanding charges";
+
 
         let getTotalCharges = ()=>{
             let totalCharges = 0;

@@ -1,7 +1,7 @@
 import React from "react";
 import {Field, FormSection} from "redux-form";
 import TagsInput from "react-tagsinput"
-import {inputField, selectField, priceField} from "../elements/forms/servicebot-base-field.jsx";
+import {inputField, selectField, priceField} from "servicebot-base-form";
 import consume from "pluginbot-react/dist/consume";
 
 const values = require('object.values');
@@ -21,39 +21,38 @@ let PriceOperation = (props) => {
 };
 
 let RenderWidget = (props) => {
-    const {showPrice, member, widgetType, configValue, defaultWidgetValue} = props;
+    const {showPrice, member, currency, widgetType, configValue, defaultWidgetValue} = props;
     const widget = props.services && props.services.widget && props.services.widget.find(widgetToCheck => widgetToCheck.type === widgetType);
     if (!widget) {
-        console.error("widget does not exist ", widgetType);
+        return <React.Fragment/>
     }
     return (
-        <div>
-            <FormSection name={`${member}.config`}>
+        <React.Fragment>
+            <FormSection name={`${member}.config`} className={`form-section`}>
                 {widget.config && <Field name={`value`} component={widget.config}/>}
                 {widget.pricing && showPrice &&
                 <div className="addon-widget-has-pricing">
-                    <FormSection name={`pricing`}>
+                    <FormSection name={`pricing`} className={`form-section`}>
+                        <Field name="operation" component={selectField} label="Apply Price Change"
+                               options={[
+                                   {id: "add", name: "Add to base price"},
+                                   {id: "subtract", name: "Subtract from base price"},
+                                   {id: "multiply", name: "Percent add to base price"},
+                                   {id: "divide", name: "Percent off from base price"},
+                               ]}/>
 
-                    <Field name="operation" component={selectField} label="Apply Price Change"
-                           options={[
-                               {id: "add", name: "Add to base price"},
-                               {id: "subtract", name: "Subtract from base price"},
-                               {id: "multiply", name: "Percent add to base price"},
-                               {id: "divide", name: "Percent off from base price"},
-                           ]}/>
-
-                        <div className="form-group form-group-flex addon-widget-pricing-inputs-wrapper">
-                            <label className="control-label form-label-flex-md addon-widget-pricing-input-label">Add-On Pricing</label>
-                            <Field name={`value`} configValue={configValue} component={widget.pricing}/>
+                        <div className="sb-form-group _group-addon-pricing">
+                            <label className="_label-">Add-On Pricing</label>
+                            <Field name={`value`} currency={currency} configValue={configValue} component={widget.pricing}/>
                         </div>
                     </FormSection>
                 </div>}
             </FormSection>
-            {widget.widget &&<div>
-                <label className="control-label form-label-flex-md addon-widget-pricing-input-label">Default Value</label>
-                <Field name={`${member}.data.value`} configValue={configValue} component={widget.widget}/>
-            </div>}
-        </div>
+            { widget.widget && <React.Fragment>
+                <label className="_label- __default-value">Default Value</label>
+                <Field name={`${member}.data.value`} className="checkbox-default-value" currency={currency} configValue={configValue} component={widget.widget}/>
+            </React.Fragment> }
+        </React.Fragment>
     );
 };
 
@@ -74,16 +73,17 @@ let PriceBreakdown = (props) => {
     }, []);
 
     if (breakdown.length == 0) {
-        breakdown = <div/>
+        breakdown = <React.Fragment/>
     }
     return (
-        <div>
+        <React.Fragment>
             {breakdown}
-        </div>
+        </React.Fragment>
     );
 };
 let WidgetList = props => (
     <Field name={props.name} id={props.name} component={selectField}
+           className={`widget-list`}
            options={props.services.widget} valueKey="type" labelKey="label"
     />
 );
