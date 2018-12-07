@@ -34,8 +34,8 @@ class Footer extends React.Component {
         return (
             <div className="footer" style={footerBackgroundStyle}>
                 <p className="powerby" style={footerTextStyle}>
-                    <Link className="powerby-servicebot" target="_blank" to="http://servicebot.io" style={footerTextStyle}>
-                        Powered by servicebot.io
+                    <Link className="powerby-servicebot" target="_blank" to="https://printaura.com" style={footerTextStyle}>
+                        A service of Printaura.com
                     </Link>
                 </p>
                 {this.props.services.footerComponent && this.props.services.footerComponent.map((comp, index) => {
