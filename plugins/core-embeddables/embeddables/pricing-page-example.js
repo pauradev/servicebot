@@ -1,6 +1,6 @@
 <div id="servicebot-tiers-embed"></div>
 <script src="https://js.stripe.com/v3/"></script>
-<script src="https://servicebot.io/js/servicebot-tiers-embed.js" type="text/javascript"></script>
+<script src="http://subscribe.printaura.com/js/servicebot-tiers-embed.js" type="text/javascript"></script>
 <script  type="text/javascript">
     Servicebot.Tiers({
         templateId : 1,

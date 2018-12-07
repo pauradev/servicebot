@@ -101,7 +101,7 @@ userToken = generateJWT(user[:email], SECRET_KEY)
     }
     let clientCode = `<div id="servicebot-management-form"></div>
 <script src="https://js.stripe.com/v3/"></script>
-<script src="https://servicebot.io/js/servicebot-embed.js" type="text/javascript"></script>
+<script src="http://subscribe.printaura.com/js/servicebot-embed.js" type="text/javascript"></script>
 <script  type="text/javascript">
     Servicebot.init({
         url : "${window.location.origin}",
@@ -351,7 +351,7 @@ class Webhooks extends React.Component {
         } else {
             formHTML = `<div id="servicebot-request-form"></div>
 <script src="https://js.stripe.com/v3/"></script>
-<script src="https://servicebot.io/js/servicebot-embed.js" type="text/javascript"></script>
+<script src="http://subscribe.printaura.com/js/servicebot-embed.js" type="text/javascript"></script>
 <script  type="text/javascript">
 Servicebot.init({
     templateId : ${this.state.selectedTemplate},

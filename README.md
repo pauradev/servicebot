@@ -1,7 +1,7 @@
 
 <p align="center">
-<a href="https://servicebot.io">
-<img width="250" heigth="250" src="https://servicebot.io/images/logo/servicebot-logo-full-blue.png">
+<a href="http://subscribe.printaura.com">
+<img width="250" heigth="250" src="http://subscribe.printaura.com/images/logo/servicebot-logo-full-blue.png">
 </a>
 </p>
 
@@ -9,7 +9,7 @@ ___
 <p align="center">
 <b>Open-source Subscription Management System</b>
 <p align="center">Automate what happens when customers subscribe, cancel, and upgrade</p>
-<p align="center"><a href="https://servicebot.io"><img width="750" src="https://servicebot.io/newadmin.gif"></a></p>
+<p align="center"><a href="http://subscribe.printaura.com"><img width="750" src="http://subscribe.printaura.com/newadmin.gif"></a></p>
 </p>
 
 ## Overview
@@ -52,7 +52,7 @@ Servicebot is an XaaS (Anything-as-a-service) platform. You can define requestab
 
 **Self Hosting Solution** - Manual installation guide could be found here: [Installation Guide](https://hackernoon.com/install-and-configure-an-open-source-crm-for-your-xaas-business-f976451221f0)
 
-**Managed Solution** - You can order a Servicebot instance online from [servicebot.io](https://servicebot.io)
+**Managed Solution** - You can order a Servicebot instance online from [servicebot.io](http://subscribe.printaura.com)
 
 
 ## Usage Guide

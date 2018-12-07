@@ -17,7 +17,7 @@ class ModalEmbedTemplate extends React.Component {
         let currentModal = self.state.current_modal;
         let embedHTML = `<div id="servicebot-request-form"></div>
 <script src="https://js.stripe.com/v3/"></script>
-<script src="https://servicebot.io/js/servicebot-embed.js" type="text/javascript"></script>
+<script src="http://subscribe.printaura.com/js/servicebot-embed.js" type="text/javascript"></script>
 <script  type="text/javascript">
 Servicebot.init({
     templateId : ${this.props.templateObject.id},

@@ -22,7 +22,7 @@ class SetupDB extends React.Component{
             <div className="_section">
                 <p>
                     Enter your PostgreSQL database information. If you don't have access to a database, you can try the instant
-                    <a href="https://servicebot.io/pricing" target="_blank"> ServiceBot cloud hosted solution</a>.
+                    <a href="http://subscribe.printaura.com/pricing" target="_blank"> ServiceBot cloud hosted solution</a>.
                 </p>
                 <div className="sb-form-group">
                         <label className="control-label">Database Host</label>
