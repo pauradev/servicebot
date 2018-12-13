@@ -9,3 +9,11 @@ env
 package-lock.json
 .flooignore
 .floo
+docker-compose.tmpl
+docker-compose.yaml
+index.nginx-debian.html
+nginx.conf
+public/google39ea2da83acce0d0.html
+public/js/test.js
+site.conf
+site.conf.cp
