@@ -17,7 +17,8 @@ function* run(config, provide, channels) {
         pre_payment_structure_change: [],
         post_payment_structure_change: [],
         post_seat_created: [],
-        post_seat_deleted: []
+        post_seat_deleted: [],
+        post_cancellation_pending: []
 
     }
 
@@ -132,7 +133,16 @@ function* run(config, provide, channels) {
                 result = {...result, ...hookresult};
             }
             return result;
+        },
+        postCancellationPending : async function({instance, end_date}){
+            let result = {}
+            for(let hook of lifecycles.post_cancellation_pending){
+                let hookresult = await hook.run({instance, end_date});
+                result = {...result, ...hookresult};
+            }
+            return result;
         }
+
 
 
 
